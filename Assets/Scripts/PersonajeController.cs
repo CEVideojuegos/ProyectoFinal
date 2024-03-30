@@ -8,11 +8,13 @@ public class PersonajeController : MonoBehaviour
     [SerializeField] private float speed;
     [SerializeField] private float jumpForce;
     [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private int numeroDeSaltos;
     private Animator runAnimator;
     private bool enElSuelo;
     private bool isMoving;
     private bool isJumping;
     private bool isAtacking;
+    private bool isFalling;
     
     void Start()
     {
@@ -31,7 +33,7 @@ public class PersonajeController : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            StartCoroutine(PlayOneShot());
+            StartCoroutine(Atacar());
         }
     }
 
@@ -51,7 +53,9 @@ public class PersonajeController : MonoBehaviour
         {
             isJumping = false;
             enElSuelo = true;
+            isFalling = false;
         }
+        
     }
 
     void OnCollisionExit2D(Collision2D other)
@@ -60,11 +64,13 @@ public class PersonajeController : MonoBehaviour
         {
             enElSuelo = false;
         }
-
+        
         if (other.gameObject.CompareTag("Suelo") && Input.GetKey(KeyCode.Space))
         {
+            enElSuelo = false;
             isJumping = true;
             isMoving = false;
+            StartCoroutine(PlayFallingAnimation());
         }
     }
 
@@ -81,7 +87,7 @@ public class PersonajeController : MonoBehaviour
                 isMoving = true;
             }
             transform.position += Vector3.right * speed * Time.deltaTime;
-            gameObject.GetComponent<SpriteRenderer>().flipX = false;
+            FlipRigth();
         }
         else if (Input.GetKey(KeyCode.A))
         {
@@ -90,7 +96,7 @@ public class PersonajeController : MonoBehaviour
                 isMoving = true;
             }
             transform.position += Vector3.right * -speed * Time.deltaTime;
-            gameObject.GetComponent<SpriteRenderer>().flipX = true;
+            FlipLeft();
         }
         else if (Input.GetKey(KeyCode.S))
         {
@@ -98,15 +104,36 @@ public class PersonajeController : MonoBehaviour
         }
     }
 
-    private IEnumerator PlayOneShot ()
+    private IEnumerator Atacar()
     {
         runAnimator.SetBool("IsAtacking", true);
         yield return new WaitForSeconds(1.20f);
         runAnimator.SetBool("IsAtacking", false);
     }
     
-    void Atacar()
+    private IEnumerator PlayFallingAnimation()
+    {
+        yield return new WaitForSeconds(2);
+        isFalling = true;
+        runAnimator.SetBool("IsFalling", isFalling);
+    }
+
+    void FlipRigth()
+    {
+        gameObject.transform.localScale = new Vector3(5, 5, 5);
+    }
+    
+    void FlipLeft()
+    {
+        gameObject.transform.localScale = new Vector3(-5, 5, 5);
+    }
+
+    void PlayAnimarSalto(Collision2D other, bool saltar)
+    {
+        
+    }
+    /*void Atacar()
     {
             isAtacking = true;
-    }
+    }*/
 }
