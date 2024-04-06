@@ -8,13 +8,16 @@ public class PersonajeController : MonoBehaviour
     [SerializeField] private float speed;
     [SerializeField] private float jumpForce;
     [SerializeField] private Rigidbody2D rb;
-    [SerializeField] private int numeroDeSaltos;
+    [SerializeField] private GameObject renderImage;
+    [SerializeField] private int maxHealthWarrior;
     private Animator runAnimator;
     private bool enElSuelo;
-    private bool isMoving;
     private bool isJumping;
+    private bool isMoving;
     private bool isAtacking;
     private bool isFalling;
+    private bool turnPosition = true;
+    private bool invulnerability = false;
     
     void Start()
     {
@@ -47,7 +50,7 @@ public class PersonajeController : MonoBehaviour
         rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
     }
 
-    void OnCollisionEnter2D(Collision2D other)
+    void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("Suelo"))
         {
@@ -56,13 +59,22 @@ public class PersonajeController : MonoBehaviour
             isFalling = false;
         }
         
+        //TODO
+        if (other.gameObject.CompareTag("Enemy") && !invulnerability)
+        {
+            invulnerability = true;
+            runAnimator.SetBool("IsHurt", invulnerability);
+            StartCoroutine(PlayInvulnerability());
+            runAnimator.SetBool("IsHurt", invulnerability);
+        }
     }
 
-    void OnCollisionExit2D(Collision2D other)
+    void OnTriggerExit2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("Suelo"))
         {
             enElSuelo = false;
+            isFalling = false;
         }
         
         if (other.gameObject.CompareTag("Suelo") && Input.GetKey(KeyCode.Space))
@@ -113,27 +125,35 @@ public class PersonajeController : MonoBehaviour
     
     private IEnumerator PlayFallingAnimation()
     {
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(1);
         isFalling = true;
         runAnimator.SetBool("IsFalling", isFalling);
     }
 
+    private IEnumerator PlayInvulnerability()
+    {
+        maxHealthWarrior--;
+        yield return new WaitForSeconds(1.5f);
+        invulnerability = false;
+    }
+    
     void FlipRigth()
     {
         gameObject.transform.localScale = new Vector3(5, 5, 5);
+        if (!turnPosition)
+        {
+            gameObject.transform.position = new Vector3(gameObject.transform.position.x + 0.848f, gameObject.transform.position.y, 0);
+            turnPosition = true;
+        }
     }
     
     void FlipLeft()
     {
         gameObject.transform.localScale = new Vector3(-5, 5, 5);
+        if (turnPosition)
+        {
+            gameObject.transform.position = new Vector3(gameObject.transform.position.x - 0.729f, gameObject.transform.position.y, 0);
+            turnPosition = false;
+        }
     }
-
-    void PlayAnimarSalto(Collision2D other, bool saltar)
-    {
-        
-    }
-    /*void Atacar()
-    {
-            isAtacking = true;
-    }*/
 }
