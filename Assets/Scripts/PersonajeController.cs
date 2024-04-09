@@ -13,7 +13,8 @@ public class PersonajeController : MonoBehaviour
     private Animator runAnimator;
     private bool enElSuelo;
     private bool isJumping;
-    private bool isMoving;
+    private bool isWalking;
+    private bool isRunning;
     private bool isAtacking;
     private bool isFalling;
     private bool turnPosition = true;
@@ -27,8 +28,9 @@ public class PersonajeController : MonoBehaviour
 
     void Update()
     {
-        runAnimator.SetBool("IsMoving", isMoving);
+        runAnimator.SetBool("IsWalking", isWalking);
         runAnimator.SetBool("IsJumping", isJumping);
+        
         if (Input.GetKeyDown(KeyCode.Space) && enElSuelo)
         {
             Saltar();
@@ -57,9 +59,9 @@ public class PersonajeController : MonoBehaviour
             isJumping = false;
             enElSuelo = true;
             isFalling = false;
+            runAnimator.ResetTrigger("IsFalling");
         }
         
-        //TODO
         if (other.gameObject.CompareTag("Enemy") && !invulnerability)
         {
             invulnerability = true;
@@ -75,37 +77,51 @@ public class PersonajeController : MonoBehaviour
         {
             enElSuelo = false;
             isFalling = false;
+
         }
         
         if (other.gameObject.CompareTag("Suelo") && Input.GetKey(KeyCode.Space))
         {
             enElSuelo = false;
             isJumping = true;
-            isMoving = false;
+            isWalking = false;
             StartCoroutine(PlayFallingAnimation());
         }
     }
 
     void Moverse()
     {
+        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.A))
+        {
+            speed = 6;
+            isRunning = true;
+            runAnimator.SetBool("IsRunning", isRunning);
+        }
+        else
+        {
+            speed = 3.7f;
+            isRunning = false;
+            runAnimator.ResetTrigger("IsRunning");
+        }
+        
         if (!(Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.S)))
         {
-            isMoving = false;
+            isWalking = false;
         }
         if (Input.GetKey(KeyCode.D))
         {
-            if (!isJumping)
+            if (!isJumping && !isRunning)
             {
-                isMoving = true;
+                isWalking = true;
             }
             transform.position += Vector3.right * speed * Time.deltaTime;
             FlipRigth();
         }
         else if (Input.GetKey(KeyCode.A))
         {
-            if (!isJumping)
+            if (!isJumping && !isRunning)
             {
-                isMoving = true;
+                isWalking = true;
             }
             transform.position += Vector3.right * -speed * Time.deltaTime;
             FlipLeft();
