@@ -14,10 +14,12 @@ public class PersonajeController : MonoBehaviour
     private bool enElSuelo;
     private bool isJumping;
     private bool isMoving;
-    private bool isAtacking;
+    private bool isAtacking = false;
     private bool isFalling;
     private bool turnPosition = true;
     private bool invulnerability = false;
+
+
     
     void Start()
     {
@@ -27,15 +29,30 @@ public class PersonajeController : MonoBehaviour
 
     void Update()
     {
-        runAnimator.SetBool("IsMoving", isMoving);
+        if(!enElSuelo)
+        {
+            StartCoroutine(PlayFallingAnimation());
+        }
+
+        if(isMoving)
+        {
+            runAnimator.SetTrigger("IsMoving");
+        }
+        else
+        {
+            runAnimator.ResetTrigger("IsMoving");
+        }
+        
         runAnimator.SetBool("IsJumping", isJumping);
+
         if (Input.GetKeyDown(KeyCode.Space) && enElSuelo)
         {
             Saltar();
         }
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !isAtacking)
         {
+            isAtacking = true;
             StartCoroutine(Atacar());
         }
     }
@@ -62,22 +79,26 @@ public class PersonajeController : MonoBehaviour
         //TODO
         if (other.gameObject.CompareTag("Enemy") && !invulnerability)
         {
+            runAnimator.ResetTrigger("IsJumping");
+            isJumping = false;
+            runAnimator.ResetTrigger("IsMoving");
+            isMoving = false;
+            runAnimator.ResetTrigger("IsAtacking");
             invulnerability = true;
-            runAnimator.SetBool("IsHurt", invulnerability);
+            runAnimator.SetTrigger("IsHurt");
             StartCoroutine(PlayInvulnerability());
-            runAnimator.SetBool("IsHurt", invulnerability);
         }
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Suelo"))
+        /*if (other.gameObject.CompareTag("Suelo"))
         {
             enElSuelo = false;
             isFalling = false;
-        }
+        }*/
         
-        if (other.gameObject.CompareTag("Suelo") && Input.GetKey(KeyCode.Space))
+        if (other.gameObject.CompareTag("Suelo"))
         {
             enElSuelo = false;
             isJumping = true;
@@ -88,53 +109,61 @@ public class PersonajeController : MonoBehaviour
 
     void Moverse()
     {
-        if (!(Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.S)))
+        if(!invulnerability)
         {
-            isMoving = false;
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            if (!isJumping)
+            if (!(Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.S)))
             {
-                isMoving = true;
+                isMoving = false;
             }
-            transform.position += Vector3.right * speed * Time.deltaTime;
-            FlipRigth();
-        }
-        else if (Input.GetKey(KeyCode.A))
-        {
-            if (!isJumping)
+            if (Input.GetKey(KeyCode.D))
             {
-                isMoving = true;
+                if (!isJumping)
+                {
+                    isMoving = true;
+                }
+                transform.position += Vector3.right * speed * Time.deltaTime;
+                FlipRigth();
             }
-            transform.position += Vector3.right * -speed * Time.deltaTime;
-            FlipLeft();
-        }
-        else if (Input.GetKey(KeyCode.S))
-        {
-            transform.position += Vector3.up * -speed * Time.deltaTime;
+            else if (Input.GetKey(KeyCode.A))
+            {
+                if (!isJumping)
+                {
+                    isMoving = true;
+                }
+                transform.position += Vector3.right * -speed * Time.deltaTime;
+                FlipLeft();
+            }
+            else if (Input.GetKey(KeyCode.S))
+            {
+                transform.position += Vector3.up * -speed * Time.deltaTime;
+            }
         }
     }
 
     private IEnumerator Atacar()
     {
-        runAnimator.SetBool("IsAtacking", true);
+        runAnimator.SetTrigger("IsAtacking");
         yield return new WaitForSeconds(1.20f);
-        runAnimator.SetBool("IsAtacking", false);
+        isAtacking = false;
+        runAnimator.ResetTrigger("IsAtacking");
     }
     
     private IEnumerator PlayFallingAnimation()
     {
-        yield return new WaitForSeconds(1);
         isFalling = true;
-        runAnimator.SetBool("IsFalling", isFalling);
+        runAnimator.SetTrigger("IsFalling");
+        yield return new WaitForSeconds(1);
     }
 
     private IEnumerator PlayInvulnerability()
     {
+        //Arreglado error de bucle de animacion, añadida linea 139
         maxHealthWarrior--;
+        //Debug.Log(maxHealthWarrior);
         yield return new WaitForSeconds(1.5f);
+        runAnimator.ResetTrigger("IsHurt");
         invulnerability = false;
+        //Debug.Log(invulnerability);
     }
     
     void FlipRigth()
