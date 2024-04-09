@@ -157,7 +157,7 @@ Rigidbody2D:
   m_Mass: 1.4094
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 2
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -226,7 +226,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cccdffd4861df64c997b6a8e7994a87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jumpForce: 4.5
+  jumpForce: 8
   rb: {fileID: 220460126}
 --- !u!61 &220460132
 BoxCollider2D:
@@ -355,7 +355,7 @@ Rigidbody2D:
   m_Mass: 1.1131483
   m_LinearDrag: 0
   m_AngularDrag: 0
-  m_GravityScale: 1
+  m_GravityScale: 2.5
   m_Material: {fileID: 6200000, guid: a9b8de1ae9a70e14796b3e1bda9995e6, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
@@ -380,7 +380,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
-  jumpForce: 7
+  jumpForce: 13
   rb: {fileID: 223205779}
   renderImage: {fileID: 1699346258}
   maxHealthWarrior: 3
