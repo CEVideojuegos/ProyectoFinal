@@ -10,14 +10,16 @@ public class PersonajeController : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private GameObject renderImage;
     [SerializeField] private int maxHealthWarrior;
+    [SerializeField] private Camera mainCamera;
     private Animator runAnimator;
     private bool enElSuelo;
     private bool isJumping;
-    private bool isMoving;
-    private bool isAtacking = false;
+    private bool isWalking;
+    private bool isRunning;
+    private bool isAtacking;
     private bool isFalling;
     private bool turnPosition = true;
-    private bool invulnerability = false;
+    private bool invulnerability;
 
 
     
@@ -33,15 +35,22 @@ public class PersonajeController : MonoBehaviour
         {
             StartCoroutine(PlayFallingAnimation());
         }
-
-        if(isMoving)
+        if(isWalking)
         {
-            runAnimator.SetTrigger("IsMoving");
+            runAnimator.SetTrigger("IsWalking");
         }
         else
         {
-            runAnimator.ResetTrigger("IsMoving");
+            runAnimator.ResetTrigger("IsWalking");
+        }if(isRunning)
+        {
+            runAnimator.SetTrigger("IsRunning");
         }
+        else
+        {
+            runAnimator.ResetTrigger("IsRunning");
+        }
+        
         
         runAnimator.SetBool("IsJumping", isJumping);
 
@@ -74,15 +83,17 @@ public class PersonajeController : MonoBehaviour
             isJumping = false;
             enElSuelo = true;
             isFalling = false;
+            runAnimator.ResetTrigger("IsFalling");
         }
         
-        //TODO
         if (other.gameObject.CompareTag("Enemy") && !invulnerability)
         {
             runAnimator.ResetTrigger("IsJumping");
             isJumping = false;
-            runAnimator.ResetTrigger("IsMoving");
-            isMoving = false;
+            runAnimator.ResetTrigger("IsWalking");
+            runAnimator.ResetTrigger("IsRunning");
+            isWalking = false;
+            isRunning = false;
             runAnimator.ResetTrigger("IsAtacking");
             invulnerability = true;
             runAnimator.SetTrigger("IsHurt");
@@ -92,50 +103,53 @@ public class PersonajeController : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D other)
     {
-        /*if (other.gameObject.CompareTag("Suelo"))
-        {
-            enElSuelo = false;
-            isFalling = false;
-        }*/
-        
         if (other.gameObject.CompareTag("Suelo"))
         {
             enElSuelo = false;
             isJumping = true;
-            isMoving = false;
+            isWalking = false;
             StartCoroutine(PlayFallingAnimation());
         }
     }
 
     void Moverse()
     {
-        if(!invulnerability)
+    if(!invulnerability)
         {
+            if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.A))
+            {
+                speed = 6;
+                isRunning = true;
+                runAnimator.SetBool("IsRunning", isRunning);
+            }
+            else
+            {
+                speed = 3.7f;
+                isRunning = false;
+                runAnimator.ResetTrigger("IsRunning");
+            }
+            
             if (!(Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.S)))
             {
-                isMoving = false;
+                isWalking = false;
             }
             if (Input.GetKey(KeyCode.D))
             {
-                if (!isJumping)
+                if (!isJumping && !isRunning)
                 {
-                    isMoving = true;
+                    isWalking = true;
                 }
                 transform.position += Vector3.right * speed * Time.deltaTime;
                 FlipRigth();
             }
             else if (Input.GetKey(KeyCode.A))
             {
-                if (!isJumping)
+                if (!isJumping && !isRunning)
                 {
-                    isMoving = true;
+                    isWalking = true;
                 }
                 transform.position += Vector3.right * -speed * Time.deltaTime;
                 FlipLeft();
-            }
-            else if (Input.GetKey(KeyCode.S))
-            {
-                transform.position += Vector3.up * -speed * Time.deltaTime;
             }
         }
     }
@@ -157,13 +171,10 @@ public class PersonajeController : MonoBehaviour
 
     private IEnumerator PlayInvulnerability()
     {
-        //Arreglado error de bucle de animacion, añadida linea 139
         maxHealthWarrior--;
-        //Debug.Log(maxHealthWarrior);
         yield return new WaitForSeconds(1.5f);
         runAnimator.ResetTrigger("IsHurt");
         invulnerability = false;
-        //Debug.Log(invulnerability);
     }
     
     void FlipRigth()
@@ -172,6 +183,7 @@ public class PersonajeController : MonoBehaviour
         if (!turnPosition)
         {
             gameObject.transform.position = new Vector3(gameObject.transform.position.x + 0.848f, gameObject.transform.position.y, 0);
+            //mainCamera.transform.position = new Vector3(gameObject.transform.position.x - 0.848f, gameObject.transform.position.y, mainCamera.transform.position.z);
             turnPosition = true;
         }
     }
@@ -182,6 +194,7 @@ public class PersonajeController : MonoBehaviour
         if (turnPosition)
         {
             gameObject.transform.position = new Vector3(gameObject.transform.position.x - 0.729f, gameObject.transform.position.y, 0);
+            //mainCamera.transform.position = new Vector3(gameObject.transform.position.x + 0.729f, gameObject.transform.position.y, mainCamera.transform.position.z);
             turnPosition = false;
         }
     }
