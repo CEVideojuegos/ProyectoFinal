@@ -18,6 +18,8 @@ public class PersonajeController : MonoBehaviour
     private bool isRunning;
     private bool isAtacking;
     private bool isFalling;
+    private bool isSliding;
+    private bool cooldown;
     private bool turnPosition = true;
     private bool invulnerability;
 
@@ -25,24 +27,34 @@ public class PersonajeController : MonoBehaviour
     
     void Start()
     {
+        cooldown = false;
         rb = GetComponent<Rigidbody2D>();
         runAnimator = GetComponent<Animator>();
     }
 
     void Update()
     {
-        if(!enElSuelo)
+        if(!enElSuelo && !isSliding)
         {
             StartCoroutine(PlayFallingAnimation());
         }
-        if(isWalking)
+        if (isSliding)
+        {
+            runAnimator.SetTrigger("IsSliding");
+        }
+        else
+        {
+            runAnimator.ResetTrigger("IsSliding");
+        }
+        if(isWalking && !isSliding)
         {
             runAnimator.SetTrigger("IsWalking");
         }
         else
         {
             runAnimator.ResetTrigger("IsWalking");
-        }if(isRunning)
+        }
+        if(isRunning && !isSliding)
         {
             runAnimator.SetTrigger("IsRunning");
         }
@@ -50,8 +62,6 @@ public class PersonajeController : MonoBehaviour
         {
             runAnimator.ResetTrigger("IsRunning");
         }
-        
-        
         runAnimator.SetBool("IsJumping", isJumping);
 
         if (Input.GetKeyDown(KeyCode.Space) && enElSuelo)
@@ -118,15 +128,15 @@ public class PersonajeController : MonoBehaviour
         {
             if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.A))
             {
+                Deslizar();
                 speed = 6;
                 isRunning = true;
-                runAnimator.SetBool("IsRunning", isRunning);
             }
             else
             {
+                Deslizar();
                 speed = 3.7f;
                 isRunning = false;
-                runAnimator.ResetTrigger("IsRunning");
             }
             
             if (!(Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.S)))
@@ -135,6 +145,7 @@ public class PersonajeController : MonoBehaviour
             }
             if (Input.GetKey(KeyCode.D))
             {
+                Deslizar();
                 if (!isJumping && !isRunning)
                 {
                     isWalking = true;
@@ -144,6 +155,7 @@ public class PersonajeController : MonoBehaviour
             }
             else if (Input.GetKey(KeyCode.A))
             {
+                Deslizar();
                 if (!isJumping && !isRunning)
                 {
                     isWalking = true;
@@ -154,6 +166,26 @@ public class PersonajeController : MonoBehaviour
         }
     }
 
+    private void Deslizar()
+    {
+        if (Input.GetKey(KeyCode.C) && !isJumping && !cooldown)
+        {
+            cooldown = true;
+            isSliding = true;
+            speed = 6;
+            StartCoroutine(PlaySliding());
+        }
+    }
+    
+    private IEnumerator PlaySliding()
+    {
+        runAnimator.SetTrigger("IsSliding");
+        yield return new WaitForSeconds(1.10f);
+        isSliding = false;
+        cooldown = false;
+        runAnimator.ResetTrigger("IsSliding");
+    }
+    
     private IEnumerator Atacar()
     {
         runAnimator.SetTrigger("IsAtacking");
