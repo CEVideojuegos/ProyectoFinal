@@ -10,6 +10,7 @@ public class PersonajeController : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private GameObject renderImage;
     [SerializeField] private int maxHealthWarrior;
+    [SerializeField] private Camera mainCamera;
     private Animator runAnimator;
     private bool enElSuelo;
     private bool isJumping;
@@ -182,6 +183,7 @@ public class PersonajeController : MonoBehaviour
         if (!turnPosition)
         {
             gameObject.transform.position = new Vector3(gameObject.transform.position.x + 0.848f, gameObject.transform.position.y, 0);
+            //mainCamera.transform.position = new Vector3(gameObject.transform.position.x - 0.848f, gameObject.transform.position.y, mainCamera.transform.position.z);
             turnPosition = true;
         }
     }
@@ -192,6 +194,7 @@ public class PersonajeController : MonoBehaviour
         if (turnPosition)
         {
             gameObject.transform.position = new Vector3(gameObject.transform.position.x - 0.729f, gameObject.transform.position.y, 0);
+            //mainCamera.transform.position = new Vector3(gameObject.transform.position.x + 0.729f, gameObject.transform.position.y, mainCamera.transform.position.z);
             turnPosition = false;
         }
     }
