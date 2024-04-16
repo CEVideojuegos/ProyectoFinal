@@ -12,7 +12,8 @@ public class PersonajeController : MonoBehaviour
     [SerializeField] private int maxHealthWarrior;
     [SerializeField] private Camera mainCamera;
     private Animator runAnimator;
-    private bool enElSuelo;
+    private bool IsOnGround;
+    private bool isIdle;
     private bool isJumping;
     private bool isWalking;
     private bool isRunning;
@@ -22,7 +23,7 @@ public class PersonajeController : MonoBehaviour
     private bool turnPosition = true;
     private bool invulnerability;
 
-
+    private String[] NombreAnimaciones = new String[] {"IsJumping", "IsFalling", "IsWalking", "IsRunning", "IsAtacking", "IsHurt", "IsIdle"} ;
     
     void Start()
     {
@@ -32,7 +33,7 @@ public class PersonajeController : MonoBehaviour
 
     void Update()
     {
-        if(!enElSuelo)
+        if(!IsOnGround && !isJumping)
         {
             StartCoroutine(PlayFallingAnimation());
         }
@@ -71,7 +72,7 @@ public class PersonajeController : MonoBehaviour
 
         //runAnimator.SetBool("IsJumping", isJumping);
 
-        if (Input.GetKeyDown(KeyCode.Space) && enElSuelo)
+        if (Input.GetKeyDown(KeyCode.Space) && IsOnGround)
         {
             Saltar();
         }
@@ -88,10 +89,10 @@ public class PersonajeController : MonoBehaviour
             if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.A))
             {
                 speed = 6;
-                isRunning = true;    //variables con valores true
+                isRunning = true;    
                 isWalking = false;
                 isJumping = false;
-                runAnimator.SetBool("IsRunning", isRunning);
+                runAnimator.SetTrigger("IsRunning");
             }
             else
             {
@@ -136,11 +137,15 @@ public class PersonajeController : MonoBehaviour
         if (other.gameObject.CompareTag("Suelo") || other.gameObject.CompareTag("Enemy"))
         {
             isJumping = false;
-            enElSuelo = true;
+            IsOnGround = true;
             isFalling = false;
             runAnimator.ResetTrigger("IsFalling");
+            Debug.Log("isJumping = " + isJumping);
+            Debug.Log("IsOnGround = " + IsOnGround);
+            Debug.Log("isFalling = " + isFalling);
         }
-        
+
+        /*
         if (other.gameObject.CompareTag("Enemy") && !invulnerability)
         {
             runAnimator.ResetTrigger("IsFalling");
@@ -152,17 +157,24 @@ public class PersonajeController : MonoBehaviour
             isWalking = false;
             isRunning = false;
             runAnimator.ResetTrigger("IsAtacking");
+            
+
+            for(int i = 0; i < NombreAnimaciones.Length; i++)
+            {
+                runAnimator.ResetTrigger(NombreAnimaciones[i]);
+            }
+
             invulnerability = true;
             runAnimator.SetTrigger("IsHurt");
             StartCoroutine(PlayInvulnerability());
-        }
+        }*/
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("Suelo"))
         {
-            enElSuelo = false;
+            IsOnGround = false;
             isJumping = true;
             isWalking = false;
             StartCoroutine(PlayFallingAnimation());
@@ -177,7 +189,7 @@ public class PersonajeController : MonoBehaviour
             {
                 speed = 6;
                 isRunning = true;
-                runAnimator.SetBool("IsRunning", isRunning);
+                runAnimator.SetTrigger("IsRunning");
             }
             else
             {
