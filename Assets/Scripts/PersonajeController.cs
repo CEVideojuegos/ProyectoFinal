@@ -18,6 +18,7 @@ public class PersonajeController : MonoBehaviour
     private bool isRunning;
     private bool isAtacking;
     private bool isFalling;
+    private bool isHurt;
     private bool turnPosition = true;
     private bool invulnerability;
 
@@ -42,7 +43,8 @@ public class PersonajeController : MonoBehaviour
         else
         {
             runAnimator.ResetTrigger("IsWalking");
-        }if(isRunning)
+        }
+        if(isRunning)
         {
             runAnimator.SetTrigger("IsRunning");
         }
@@ -50,9 +52,24 @@ public class PersonajeController : MonoBehaviour
         {
             runAnimator.ResetTrigger("IsRunning");
         }
-        
-        
-        runAnimator.SetBool("IsJumping", isJumping);
+        if (isJumping)
+        {
+            runAnimator.SetTrigger("IsJumping");
+        }
+        else
+        {
+            runAnimator.ResetTrigger("IsJumping");
+        }
+        if (isHurt)
+        {
+            runAnimator.SetTrigger("IsHurt");
+        }
+        else
+        {
+            runAnimator.ResetTrigger("IsHurt");
+        }
+
+        //runAnimator.SetBool("IsJumping", isJumping);
 
         if (Input.GetKeyDown(KeyCode.Space) && enElSuelo)
         {
@@ -64,13 +81,51 @@ public class PersonajeController : MonoBehaviour
             isAtacking = true;
             StartCoroutine(Atacar());
         }
+
+        //Moverse();
+        if (!isHurt && !isAtacking)  //he recibido un ataque hace poco y no estoy atacando
+        {
+            if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.A))
+            {
+                speed = 6;
+                isRunning = true;    //variables con valores true
+                isWalking = false;
+                isJumping = false;
+                runAnimator.SetBool("IsRunning", isRunning);
+            }
+            else
+            {
+                speed = 3.7f;
+                isRunning = false;
+                runAnimator.ResetTrigger("IsRunning");
+            }
+
+            if (!(Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.S)))
+            {
+                isWalking = false;
+            }
+            if (Input.GetKey(KeyCode.D))
+            {
+                if (!isJumping && !isRunning)
+                {
+                    isWalking = true;
+                }
+                transform.position += Vector3.right * speed * Time.deltaTime;
+                FlipRigth();
+            }
+            else if (Input.GetKey(KeyCode.A))
+            {
+                if (!isJumping && !isRunning)
+                {
+                    isWalking = true;
+                }
+                transform.position += Vector3.right * -speed * Time.deltaTime;
+                FlipLeft();
+            }
+        }
     }
 
-    private void FixedUpdate()
-    {
-        Moverse();
-    }
-
+    
     void Saltar()
     {
         rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
@@ -78,7 +133,7 @@ public class PersonajeController : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Suelo"))
+        if (other.gameObject.CompareTag("Suelo") || other.gameObject.CompareTag("Enemy"))
         {
             isJumping = false;
             enElSuelo = true;
@@ -88,6 +143,8 @@ public class PersonajeController : MonoBehaviour
         
         if (other.gameObject.CompareTag("Enemy") && !invulnerability)
         {
+            runAnimator.ResetTrigger("IsFalling");
+            isFalling = false;
             runAnimator.ResetTrigger("IsJumping");
             isJumping = false;
             runAnimator.ResetTrigger("IsWalking");
@@ -114,7 +171,7 @@ public class PersonajeController : MonoBehaviour
 
     void Moverse()
     {
-    if(!invulnerability)
+    if(!invulnerability && !isAtacking)
         {
             if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.A))
             {
@@ -157,6 +214,7 @@ public class PersonajeController : MonoBehaviour
     private IEnumerator Atacar()
     {
         runAnimator.SetTrigger("IsAtacking");
+        speed = 0.0f;
         yield return new WaitForSeconds(1.20f);
         isAtacking = false;
         runAnimator.ResetTrigger("IsAtacking");
@@ -171,10 +229,12 @@ public class PersonajeController : MonoBehaviour
 
     private IEnumerator PlayInvulnerability()
     {
+        isHurt = true;
         maxHealthWarrior--;
         yield return new WaitForSeconds(1.5f);
         runAnimator.ResetTrigger("IsHurt");
         invulnerability = false;
+        isHurt = false;
     }
     
     void FlipRigth()
