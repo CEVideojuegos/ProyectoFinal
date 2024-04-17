@@ -17,7 +17,7 @@ public class PersonajeController : MonoBehaviour
     private bool isJumping;
     private bool isWalking;
     private bool isRunning;
-    private bool isAtacking;
+    private bool isAttacking;
     private bool isFalling;
     private bool isHurt;
     private bool turnPosition = true;
@@ -33,10 +33,38 @@ public class PersonajeController : MonoBehaviour
 
     void Update()
     {
-        if(!IsOnGround && !isJumping)
+        Debug.Log("IsOnGround = " + IsOnGround);
+        Debug.Log("IsJumping = " + isJumping);
+        Debug.Log("IsFalling = " + isFalling);
+
+        /*if (isJumping || isFalling || isWalking || isRunning || isAtacking || isHurt)
         {
-            StartCoroutine(PlayFallingAnimation());
+            runAnimator.ResetTrigger("IsIdle");
         }
+        else
+        {
+            runAnimator.SetTrigger("IsIdle");
+        }
+        */
+        if (IsOnGround && !isJumping && !isFalling && !isWalking && !isRunning && !isAttacking && !isHurt)
+        {
+            runAnimator.SetTrigger("IsIdle");
+        }
+        else 
+        {
+            runAnimator.ResetTrigger("IsIdle");
+        }
+        
+        if (!IsOnGround && !isJumping)
+        {
+            //StartCoroutine(PlayFallingAnimation());
+            runAnimator.SetTrigger("IsFalling");
+        }
+        else
+        {
+            runAnimator.ResetTrigger("IsFalling");
+        }
+
         if(isWalking)
         {
             runAnimator.SetTrigger("IsWalking");
@@ -45,6 +73,7 @@ public class PersonajeController : MonoBehaviour
         {
             runAnimator.ResetTrigger("IsWalking");
         }
+
         if(isRunning)
         {
             runAnimator.SetTrigger("IsRunning");
@@ -53,6 +82,7 @@ public class PersonajeController : MonoBehaviour
         {
             runAnimator.ResetTrigger("IsRunning");
         }
+
         if (isJumping)
         {
             runAnimator.SetTrigger("IsJumping");
@@ -61,6 +91,7 @@ public class PersonajeController : MonoBehaviour
         {
             runAnimator.ResetTrigger("IsJumping");
         }
+
         if (isHurt)
         {
             runAnimator.SetTrigger("IsHurt");
@@ -70,6 +101,16 @@ public class PersonajeController : MonoBehaviour
             runAnimator.ResetTrigger("IsHurt");
         }
 
+        if (isAttacking)
+        {
+            runAnimator.SetTrigger("IsAtacking");
+        }
+        else
+        {
+            runAnimator.ResetTrigger("IsAtacking");
+        }
+
+
         //runAnimator.SetBool("IsJumping", isJumping);
 
         if (Input.GetKeyDown(KeyCode.Space) && IsOnGround)
@@ -77,14 +118,14 @@ public class PersonajeController : MonoBehaviour
             Saltar();
         }
 
-        if (Input.GetMouseButtonDown(0) && !isAtacking)
+        if (Input.GetMouseButtonDown(0) && !isAttacking)
         {
-            isAtacking = true;
+            isAttacking = true;
             StartCoroutine(Atacar());
         }
 
         //Moverse();
-        if (!isHurt && !isAtacking)  //he recibido un ataque hace poco y no estoy atacando
+        if (!isHurt && !isAttacking)  //he recibido un ataque hace poco y no estoy atacando
         {
             if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.A))
             {
@@ -92,13 +133,13 @@ public class PersonajeController : MonoBehaviour
                 isRunning = true;    
                 isWalking = false;
                 isJumping = false;
-                runAnimator.SetTrigger("IsRunning");
+                //runAnimator.SetTrigger("IsRunning");
             }
             else
             {
                 speed = 3.7f;
                 isRunning = false;
-                runAnimator.ResetTrigger("IsRunning");
+                //runAnimator.ResetTrigger("IsRunning");
             }
 
             if (!(Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.S)))
@@ -130,6 +171,7 @@ public class PersonajeController : MonoBehaviour
     void Saltar()
     {
         rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        StartCoroutine(EsperaCaida());
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -139,15 +181,13 @@ public class PersonajeController : MonoBehaviour
             isJumping = false;
             IsOnGround = true;
             isFalling = false;
-            runAnimator.ResetTrigger("IsFalling");
-            Debug.Log("isJumping = " + isJumping);
-            Debug.Log("IsOnGround = " + IsOnGround);
-            Debug.Log("isFalling = " + isFalling);
+            //runAnimator.ResetTrigger("IsFalling");
         }
 
-        /*
+        
         if (other.gameObject.CompareTag("Enemy") && !invulnerability)
         {
+            /*
             runAnimator.ResetTrigger("IsFalling");
             isFalling = false;
             runAnimator.ResetTrigger("IsJumping");
@@ -157,6 +197,7 @@ public class PersonajeController : MonoBehaviour
             isWalking = false;
             isRunning = false;
             runAnimator.ResetTrigger("IsAtacking");
+            */
             
 
             for(int i = 0; i < NombreAnimaciones.Length; i++)
@@ -165,9 +206,9 @@ public class PersonajeController : MonoBehaviour
             }
 
             invulnerability = true;
-            runAnimator.SetTrigger("IsHurt");
+            //runAnimator.SetTrigger("IsHurt");
             StartCoroutine(PlayInvulnerability());
-        }*/
+        }
     }
 
     void OnTriggerExit2D(Collider2D other)
@@ -177,13 +218,13 @@ public class PersonajeController : MonoBehaviour
             IsOnGround = false;
             isJumping = true;
             isWalking = false;
-            StartCoroutine(PlayFallingAnimation());
+            //StartCoroutine(PlayFallingAnimation());
         }
     }
 
     void Moverse()
     {
-    if(!invulnerability && !isAtacking)
+    if(!invulnerability && !isAttacking)
         {
             if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.A))
             {
@@ -225,26 +266,51 @@ public class PersonajeController : MonoBehaviour
 
     private IEnumerator Atacar()
     {
-        runAnimator.SetTrigger("IsAtacking");
+        //runAnimator.SetTrigger("IsAtacking");
         speed = 0.0f;
+        isWalking = false;
+        isFalling = false;
+        isRunning = false;
+        isJumping = false;
+        isHurt = false; 
+        isIdle = false; 
         yield return new WaitForSeconds(1.20f);
-        isAtacking = false;
-        runAnimator.ResetTrigger("IsAtacking");
+        isAttacking = false;
+        //runAnimator.ResetTrigger("IsAtacking");
     }
     
-    private IEnumerator PlayFallingAnimation()
+
+    private IEnumerator EsperaCaida()
+    {
+        isWalking = false;
+        isAttacking = false;
+        isRunning = false;
+        isJumping = false;
+        isHurt = false;
+        isIdle = false;
+        yield return new WaitForSeconds(0.5f);
+        isJumping = false;
+    }
+    private IEnumerator PlayFallingAnimation() //este ya no se usa
     {
         isFalling = true;
-        runAnimator.SetTrigger("IsFalling");
+        //runAnimator.SetTrigger("IsFalling");
         yield return new WaitForSeconds(1);
     }
 
     private IEnumerator PlayInvulnerability()
     {
+        isWalking = false;
+        isFalling = false;
+        isRunning = false;
+        isJumping = false;
+        isIdle = false;
+        isAttacking=false;
+
         isHurt = true;
         maxHealthWarrior--;
         yield return new WaitForSeconds(1.5f);
-        runAnimator.ResetTrigger("IsHurt");
+        //runAnimator.ResetTrigger("IsHurt");
         invulnerability = false;
         isHurt = false;
     }
