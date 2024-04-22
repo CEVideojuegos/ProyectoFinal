@@ -11,17 +11,22 @@ public class PersonajeController : MonoBehaviour
     [SerializeField] private GameObject renderImage;
     [SerializeField] private int maxHealthWarrior;
     [SerializeField] private Camera mainCamera;
+
     private Animator runAnimator;
+
     private bool IsOnGround;
     private bool isIdle;
     private bool isJumping;
     private bool isWalking;
     private bool isRunning;
     private bool isAttacking;
-    private bool dashAttack;
+    private bool isSliding;
+    private bool sprintAttack;
     private bool jumpAttack;
     private bool isFalling;
     private bool isHurt;
+
+    private bool canSlide = true;
     private bool turnPosition = true;
     private bool invulnerability;
 
@@ -54,12 +59,14 @@ public class PersonajeController : MonoBehaviour
         if (isRunning)
         {
             speed = speedRun;
-        } else
+        } 
+        else
         {
             speed = speedWalk;
         }
         
-        if (IsOnGround && !isJumping && !isFalling && !isWalking && !isRunning && !isAttacking && !isHurt && !dashAttack)
+        if (IsOnGround && !isJumping && !isFalling && !isWalking && !isRunning 
+            && !isAttacking && !isHurt && !sprintAttack && !jumpAttack && !isSliding)
         {
             runAnimator.SetTrigger("IsIdle");
         }
@@ -123,13 +130,22 @@ public class PersonajeController : MonoBehaviour
             runAnimator.ResetTrigger("IsAtacking");
         }
 
-        if (dashAttack || jumpAttack)
+        if (sprintAttack || jumpAttack)
         {
             runAnimator.SetTrigger("SpecialAttack");
         }
         else
         {
             runAnimator.ResetTrigger("SpecialAttack");
+        }
+
+        if (isSliding)
+        {
+            runAnimator.SetTrigger("IsSliding");
+        }
+        else
+        {
+            runAnimator.ResetTrigger("IsSliding");
         }
 
 
@@ -148,18 +164,37 @@ public class PersonajeController : MonoBehaviour
 
         if(Input.GetMouseButtonDown(0) && isRunning)
         {
-            dashAttack = true;
+            sprintAttack = true;
             StartCoroutine(Atacar());
         }
 
-        if (Input.GetMouseButtonDown(0) && isJumping)
+        if (Input.GetMouseButtonDown(0) && (isJumping || isFalling))
         {
             jumpAttack = true;
             StartCoroutine(Atacar());
         }
 
-            //Moverse();
-            if (!isHurt && !isAttacking && !dashAttack)  //he recibido un ataque hace poco y no estoy atacando
+        if (Input.GetKey(KeyCode.C) && IsOnGround && canSlide)
+        {
+            if (Input.GetKey(KeyCode.D))
+            {
+                isSliding = true;
+                canSlide = false;
+                rb.AddForce(Vector2.right * 10, ForceMode2D.Impulse);
+                StartCoroutine(Slide());
+            }
+            else if (Input.GetKey(KeyCode.A)) 
+            {
+                isSliding = true;
+                canSlide = false;
+                rb.AddForce(Vector2.left * 10, ForceMode2D.Impulse);
+                StartCoroutine(Slide());
+            }
+        }
+
+
+        //Moverse();
+        if (!isHurt && !isAttacking && !sprintAttack && !isSliding)  //he recibido un ataque hace poco y no estoy atacando
         {
             if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.A))
             {
@@ -303,14 +338,15 @@ public class PersonajeController : MonoBehaviour
     private IEnumerator Atacar()
     {
         //runAnimator.SetTrigger("IsAtacking");
-        isWalking = false;
-        isFalling = false;
-        isRunning = false;
-        isJumping = false;
-        isHurt = false; 
-        isIdle = false; 
+        //isWalking = false;
+        //isFalling = false;
+        //isRunning = false;
+        //isJumping = false;
+        //isHurt = false; 
+        //isIdle = false; 
         yield return new WaitForSeconds(0.9f);
-        dashAttack = false;
+        sprintAttack = false;
+        jumpAttack = false;
         isAttacking = false;
         //runAnimator.ResetTrigger("IsAtacking");
     }
@@ -350,6 +386,16 @@ public class PersonajeController : MonoBehaviour
         //runAnimator.ResetTrigger("IsHurt");
         invulnerability = false;
         isHurt = false;
+    }
+
+    private IEnumerator Slide()
+    {
+        isRunning = false;
+        isWalking = false;
+        yield return new WaitForSeconds(0.5f);
+        isSliding = false;
+        yield return new WaitForSeconds(1f);
+        canSlide = true;
     }
     
     void FlipRigth()
