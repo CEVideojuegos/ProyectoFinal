@@ -9,6 +9,7 @@ public class SlimeController : MonoBehaviour
     private Animator runAnimator;
     private bool enElSuelo;
     private bool isJumping = false;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();

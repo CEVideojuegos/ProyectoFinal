@@ -6,19 +6,23 @@ using UnityEngine;
 public class PersonajeController : MonoBehaviour
 {
     [SerializeField] private float speed;
+    [SerializeField] private float runSpeed;
     [SerializeField] private float jumpForce;
+    [SerializeField] private float slideVelocity;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private GameObject renderImage;
     [SerializeField] private int maxHealthWarrior;
     [SerializeField] private Camera mainCamera;
+    [SerializeField] private Collider colliderNormal;
+    [SerializeField] private Collider colliderSlide;
 
     private Animator runAnimator;
-    private Collider2D colliderBody;
     private SpriteRenderer spriteRenderer;
 
-    private bool IsOnGround;
+    [SerializeField] private bool IsOnGround;
+    [SerializeField] private float VelY;
+
     private bool isIdle;
-    private bool isJumping;
     private bool isWalking;
     private bool isRunning;
     private bool isAttacking;
@@ -31,267 +35,178 @@ public class PersonajeController : MonoBehaviour
 
     private bool canSlide = true;
     private bool turnPosition = true;
-    private bool invulnerability;
 
     private float speedRun = 6f;
     private float speedWalk = 3.7f;
 
-    private String[] NombreAnimaciones = new String[] {"IsJumping", "IsFalling", "IsWalking", "IsRunning", "IsAtacking", "IsHurt", "IsIdle"} ;
-    
+    [SerializeField] private float knockbackX;
+    [SerializeField] private float knockbackY;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         runAnimator = GetComponent<Animator>();
-        colliderBody = GetComponent<Collider2D>();
+        colliderNormal = GetComponent<Collider>();
+        colliderSlide = GetComponent<Collider>();
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void Update()
     {
-        //Debug.Log("IsOnGround = " + IsOnGround);
-        //Debug.Log("IsJumping = " + isJumping);
-        //Debug.Log("IsFalling = " + isFalling);
-
-        /*if (isJumping || isFalling || isWalking || isRunning || isAttacking || isHurt)
-        {
-            runAnimator.ResetTrigger("IsIdle");
-        }
-        else
-        {
-            runAnimator.SetTrigger("IsIdle");
-        }*/
-
         if (isDead)
         {
             runAnimator.SetTrigger("IsDead");
             
         } else if (!isDead) {
-            if (isRunning)
+
+            runAnimator.SetBool("IsGrounded", IsOnGround);
+            VelY = rb.velocity.y;
+
+            if(rb.velocity.y !=0) 
             {
-                speed = speedRun;
-            }
-            else
-            {
-                speed = speedWalk;
+                runAnimator.SetFloat("velY", VelY);
             }
 
-            if (IsOnGround && !isJumping && !isFalling && !isWalking && !isRunning
-                && !isAttacking && !isHurt && !sprintAttack && !jumpAttack && !isSliding)
-            {
-                runAnimator.SetTrigger("IsIdle");
-            }
-            else
-            {
-                runAnimator.ResetTrigger("IsIdle");
-            }
-
-            if (!IsOnGround && !isJumping && !jumpAttack)
-            {
-                //StartCoroutine(PlayFallingAnimation());
-                runAnimator.SetTrigger("IsFalling");
-            }
-            else
-            {
-                runAnimator.ResetTrigger("IsFalling");
-            }
-
-            if (isWalking)
-            {
-                runAnimator.SetTrigger("IsWalking");
-            }
-            else
-            {
-                runAnimator.ResetTrigger("IsWalking");
-            }
-
-            if (isRunning)
-            {
-                runAnimator.SetTrigger("IsRunning");
-            }
-            else
-            {
-                runAnimator.ResetTrigger("IsRunning");
-            }
-
-            if (isJumping)
-            {
-                runAnimator.SetTrigger("IsJumping");
-            }
-            else
-            {
-                runAnimator.ResetTrigger("IsJumping");
-            }
-
-            if (isHurt)
-            {
-                runAnimator.SetTrigger("IsHurt");
-            }
-            else
-            {
-                runAnimator.ResetTrigger("IsHurt");
-            }
-
-            if (isAttacking)
-            {
-                runAnimator.SetTrigger("IsAtacking");
-            }
-            else
-            {
-                runAnimator.ResetTrigger("IsAtacking");
-            }
-
-            if (sprintAttack || jumpAttack)
-            {
-                runAnimator.SetTrigger("SpecialAttack");
-            }
-            else
-            {
-                runAnimator.ResetTrigger("SpecialAttack");
-            }
-
-            if (isSliding)
-            {
-                runAnimator.SetTrigger("IsSliding");
-            }
-            else
-            {
-                runAnimator.ResetTrigger("IsSliding");
-            }
-
-
-            //runAnimator.SetBool("IsJumping", isJumping);
-
+            //Salto----------------------------------------------------------
             if (Input.GetKeyDown(KeyCode.Space) && IsOnGround && !isAttacking)
             {
                 Saltar();
             }
 
-            if (Input.GetMouseButtonDown(0) && !isAttacking && !isRunning && !isJumping)
+
+            //Ataque basico-------------------------------------------------------------
+            if (Input.GetMouseButtonDown(0) && !isAttacking && !isRunning && !IsOnGround)
             {
+                isWalking = false;
+                runAnimator.SetBool("IsWalking", false);
+                runAnimator.SetBool("IsRunning", false);
                 isAttacking = true;
+                runAnimator.SetBool("IsAttacking", true);
+                runAnimator.SetTrigger("Attack");
                 StartCoroutine(Atacar());
             }
 
-            if (Input.GetMouseButtonDown(0) && isRunning)
+            //Ataque en carrera/caida--------------------
+            if (Input.GetMouseButtonDown(0) && !isAttacking && (isRunning || !IsOnGround))
             {
-                sprintAttack = true;
+                isWalking = false;
+                runAnimator.SetBool("IsWalking", false);
+                runAnimator.SetBool("IsRunning", false);
+                isAttacking = true;
+                runAnimator.SetBool("IsAttacking", true);
+                runAnimator.SetTrigger("DashAttack");
                 StartCoroutine(Atacar());
             }
 
+            /*
             if (Input.GetMouseButtonDown(0) && (isJumping || isFalling))
             {
                 jumpAttack = true;
                 StartCoroutine(Atacar());
-            }
+            }*/
 
+            //Deslizarse-----------------------------------------
             if (Input.GetKey(KeyCode.C) && IsOnGround && canSlide)
             {
                 if (Input.GetKey(KeyCode.D))
                 {
-                    colliderBody.enabled = false;
-                    isSliding = true;
-                    canSlide = false;
-                    rb.AddForce(Vector2.right * 10, ForceMode2D.Impulse);
-                    StartCoroutine(Slide());
+                    StartCoroutine(Slide(true));
                 }
                 else if (Input.GetKey(KeyCode.A))
                 {
-                    colliderBody.enabled = false;
-                    isSliding = true;
-                    canSlide = false;
-                    rb.AddForce(Vector2.left * 10, ForceMode2D.Impulse);
-                    StartCoroutine(Slide());
+                    StartCoroutine(Slide(false));
                 }
             }
 
-            //Moverse();
-            if (!isHurt && !isAttacking && !sprintAttack && !isSliding)  //he recibido un ataque hace poco y no estoy atacando
+            //Movimiento en suelo-------------------------------------
+            if (!isHurt && !isAttacking && !sprintAttack && !isSliding)  
             {
-                if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.A))
+                //Correr
+                if(Input.GetKey(KeyCode.LeftShift))
                 {
-                    //speed = 6;
-                    isRunning = true;
-                    isWalking = false;
-                    isJumping = false;
-                    //runAnimator.SetTrigger("IsRunning");
-                }
-                else
-                {
-                    //speed = 3.7f;
-                    isRunning = false;
-                    //runAnimator.ResetTrigger("IsRunning");
+                        isRunning = true;
+                        runAnimator.SetBool("IsRunning", true);
                 }
 
-                if (!(Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.S)))
+                //Dejar de correr
+                if (Input.GetKeyUp(KeyCode.RightShift))
+                {
+                    isRunning = false;
+                    runAnimator.SetBool("IsRunning", false);
+                }
+
+                //Caminar
+                if (Input.GetKeyUp(KeyCode.D))
+                {
+                        isWalking = true;
+                        runAnimator.SetBool("IsWalking", true);
+                        
+                    if(isRunning)
+                    {
+                        speed = speedRun;
+                    }
+                    else
+                    {
+                        speed = speedWalk;
+                    }
+
+                    transform.position = Vector3.right * speed * Time.deltaTime;
+                }
+
+                if (Input.GetKeyUp(KeyCode.A))
+                {
+                    isWalking = true;
+                    runAnimator.SetBool("IsWalking", true);
+
+                    if (isRunning)
+                    {
+                        speed = speedRun;
+                    }
+                    else
+                    {
+                        speed = speedWalk;
+                    }
+
+                    transform.position = Vector3.right * speed * Time.deltaTime;
+                }
+
+                //Parar movimiento
+                if ((Input.GetKeyUp(KeyCode.A)) || (Input.GetKeyUp(KeyCode.D)))
                 {
                     isWalking = false;
-                }
-                if (Input.GetKey(KeyCode.D))
-                {
-                    if (!isJumping && !isRunning)
-                    {
-                        isWalking = true;
-                    }
-                    transform.position += Vector3.right * speed * Time.deltaTime;
-                    FlipRigth();
-                }
-                else if (Input.GetKey(KeyCode.A))
-                {
-                    if (!isJumping && !isRunning)
-                    {
-                        isWalking = true;
-                    }
-                    transform.position += Vector3.right * -speed * Time.deltaTime;
-                    FlipLeft();
+                    runAnimator.SetBool("IsWalking", false) ;
+                    runAnimator.SetBool("IsRunning", false);
                 }
             }
         }
     }
 
-        
-
-    
     void Saltar()
     {
-        rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        rb.velocity = new Vector2 (0f, jumpForce);
         StartCoroutine(EsperaCaida());
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Suelo") || other.gameObject.CompareTag("Enemy"))
+        if (other.gameObject.CompareTag("Suelo"))
         {
-            isJumping = false;
             IsOnGround = true;
             isFalling = false;
-            jumpAttack = false;
-            //runAnimator.ResetTrigger("IsFalling");
         }
 
         
-        if (other.gameObject.CompareTag("Enemy") && !invulnerability)
+        if (other.gameObject.CompareTag("Enemy") && !isHurt)
         {
-            /*
-            runAnimator.ResetTrigger("IsFalling");
-            isFalling = false;
-            runAnimator.ResetTrigger("IsJumping");
-            isJumping = false;
-            runAnimator.ResetTrigger("IsWalking");
-            runAnimator.ResetTrigger("IsRunning");
-            isWalking = false;
-            isRunning = false;
-            runAnimator.ResetTrigger("IsAtacking");
-            */
-            
+            StartCoroutine(PlayInvulnerability(other.transform));
+        }
+    }
 
-            for(int i = 0; i < NombreAnimaciones.Length; i++)
-            {
-                runAnimator.ResetTrigger(NombreAnimaciones[i]);
-            }
-
-            invulnerability = true;
-            //runAnimator.SetTrigger("IsHurt");
-            StartCoroutine(PlayInvulnerability());
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.CompareTag("Suelo"))
+        {
+            IsOnGround = true;
         }
     }
 
@@ -300,126 +215,85 @@ public class PersonajeController : MonoBehaviour
         if (other.gameObject.CompareTag("Suelo"))
         {
             IsOnGround = false;
-            isJumping = true;
-            isWalking = false;
-            isRunning = false;
-            //StartCoroutine(PlayFallingAnimation());
-        }
-    }
-
-    void Moverse()
-    {
-    if(!invulnerability && !isAttacking)
-        {
-            if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.A))
-            {
-                speed = 6;
-                isRunning = true;
-                runAnimator.SetTrigger("IsRunning");
-            }
-            else
-            {
-                speed = 3.7f;
-                isRunning = false;
-                runAnimator.ResetTrigger("IsRunning");
-            }
-            
-            if (!(Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.S)))
-            {
-                isWalking = false;
-            }
-            if (Input.GetKey(KeyCode.D))
-            {
-                if (!isJumping && !isRunning)
-                {
-                    isWalking = true;
-                }
-                transform.position += Vector3.right * speed * Time.deltaTime;
-                FlipRigth();
-            }
-            else if (Input.GetKey(KeyCode.A))
-            {
-                if (!isJumping && !isRunning)
-                {
-                    isWalking = true;
-                }
-                transform.position += Vector3.right * -speed * Time.deltaTime;
-                FlipLeft();
-            }
         }
     }
 
     private IEnumerator Atacar()
     {
-        //runAnimator.SetTrigger("IsAtacking");
-        //isWalking = false;
-        //isFalling = false;
-        //isRunning = false;
-        //isJumping = false;
-        //isHurt = false; 
-        //isIdle = false; 
-        yield return new WaitForSeconds(0.9f);
-        sprintAttack = false;
-        jumpAttack = false;
+        yield return new WaitForSeconds(1f);
         isAttacking = false;
-        //runAnimator.ResetTrigger("IsAtacking");
-    }
-    
+        runAnimator.SetBool("IsAttacking", isAttacking);
+    }  
 
-    private IEnumerator EsperaCaida()
-    {
-        isWalking = false;
-        isAttacking = false;
-        isRunning = false;
-        isJumping = false;
-        isHurt = false;
-        isIdle = false;
-        yield return new WaitForSeconds(0.5f);
-        isJumping = false;
-    }
-
-    private IEnumerator PlayFallingAnimation() //este ya no se usa
-    {
-        isFalling = true;
-        //runAnimator.SetTrigger("IsFalling");
-        yield return new WaitForSeconds(1);
-    }
-
-    private IEnumerator PlayInvulnerability()
+    private IEnumerator PlayInvulnerability(Transform enemigo)
     {
         maxHealthWarrior--;
 
         if (maxHealthWarrior <= 0)
         {
             isDead = true;
+            colliderNormal.enabled = false;
+            colliderSlide.enabled = false;
         }
         else
         {
+            isHurt = true;
             isWalking = false;
             isFalling = false;
             isRunning = false;
-            isJumping = false;
+            IsOnGround = false;
             isIdle = false;
             isAttacking = false;
+            isSliding = false;
 
-            isHurt = true;
+            runAnimator.SetBool("IsHurt", true);
+
+            if(this.transform.position.x > enemigo.position.x)
+            {
+                rb.velocity = new Vector2(knockbackX, knockbackY);
+            }
+            else
+            {
+                rb.velocity = new Vector2(-knockbackX, knockbackY);
+            }
 
             yield return new WaitForSeconds(1.5f);
-            //runAnimator.ResetTrigger("IsHurt");
-            invulnerability = false;
+            runAnimator.SetBool("IsHurt", true);
+
             isHurt = false;
         }
     }
 
-    private IEnumerator Slide()
+    private IEnumerator Slide(bool direccion)
     {
-        isRunning = false;
-        isWalking = false;
+        colliderNormal.enabled = false;
+        colliderSlide.enabled = true;
+
+        isSliding = true;
+        canSlide = false;
+        runAnimator.SetTrigger("Slide");
+        runAnimator.SetBool("IsSliding", true);
+
+        if(direccion)
+        {
+            rb.velocity = new Vector2(slideVelocity, 0f);
+        }
+        else
+        {
+            rb.velocity = new Vector2(-slideVelocity, 0f);
+        }
+
         yield return new WaitForSeconds(0.5f);
-        colliderBody.enabled = true;
+
+        colliderNormal.enabled = true;
+        colliderSlide.enabled = false;
+
         isSliding = false;
-        yield return new WaitForSeconds(1f);
+        runAnimator.SetBool("IsSliding", false);
+
+        yield return new WaitForSeconds(1.0f);
         canSlide = true;
+
     }
     
     void FlipRigth()
