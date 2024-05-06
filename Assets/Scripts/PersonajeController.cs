@@ -10,14 +10,14 @@ public class PersonajeController : MonoBehaviour
     [SerializeField] private float jumpForce;
     [SerializeField] private float slideVelocity;
     [SerializeField] private Rigidbody2D rb;
-    [SerializeField] private GameObject renderImage;
     [SerializeField] private int maxHealthWarrior;
     [SerializeField] private Camera mainCamera;
-    [SerializeField] private Collider colliderNormal;
-    [SerializeField] private Collider colliderSlide;
+    [SerializeField] private Collider2D colliderNormal;
+    [SerializeField] private Collider2D colliderSlide;
+
+    [SerializeField] GameObject hacha;
 
     private Animator runAnimator;
-    private SpriteRenderer spriteRenderer;
 
     [SerializeField] private bool IsOnGround;
     [SerializeField] private float VelY;
@@ -34,7 +34,9 @@ public class PersonajeController : MonoBehaviour
     private bool isDead;
 
     private bool canSlide = true;
-    private bool turnPosition = true;
+    private bool miraDerecha;
+    private bool miraIzquierda;
+    private bool hasAxe;
 
     private float speedRun = 6f;
     private float speedWalk = 3.7f;
@@ -42,13 +44,17 @@ public class PersonajeController : MonoBehaviour
     [SerializeField] private float knockbackX;
     [SerializeField] private float knockbackY;
 
+    [SerializeField] Transform puntoLanzamiento;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         runAnimator = GetComponent<Animator>();
-        colliderNormal = GetComponent<Collider>();
-        colliderSlide = GetComponent<Collider>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        
+        colliderNormal.enabled = true;
+        colliderSlide.enabled = false;
+        hasAxe = true;
+
     }
 
     void Update()
@@ -64,7 +70,7 @@ public class PersonajeController : MonoBehaviour
 
             if(rb.velocity.y !=0) 
             {
-                runAnimator.SetFloat("velY", VelY);
+                runAnimator.SetFloat("VelY", VelY);
             }
 
             //Salto----------------------------------------------------------
@@ -73,9 +79,8 @@ public class PersonajeController : MonoBehaviour
                 Saltar();
             }
 
-
             //Ataque basico-------------------------------------------------------------
-            if (Input.GetMouseButtonDown(0) && !isAttacking && !isRunning && !IsOnGround)
+            if (Input.GetMouseButtonDown(0) && !isAttacking && !isRunning && IsOnGround)
             {
                 isWalking = false;
                 runAnimator.SetBool("IsWalking", false);
@@ -83,7 +88,29 @@ public class PersonajeController : MonoBehaviour
                 isAttacking = true;
                 runAnimator.SetBool("IsAttacking", true);
                 runAnimator.SetTrigger("Attack");
+                Debug.Log("Input recibido");
                 StartCoroutine(Atacar());
+            }
+
+            //Lanzar hacha---------------------------------
+            if (Input.GetMouseButtonDown(1) && !isAttacking)
+            {
+                if(hasAxe) 
+                {
+                    GameObject aux;
+
+                    aux = Instantiate(hacha, puntoLanzamiento.position, puntoLanzamiento.rotation);
+
+                    if (miraDerecha)
+                    {
+                        aux.GetComponent<Rigidbody2D>().AddForce(new Vector2 (10f, 10f), ForceMode2D.Impulse);
+                    } else
+                    {
+                        aux.GetComponent<Rigidbody2D>().AddForce(new Vector2(-10f, 10f), ForceMode2D.Impulse);
+                    }
+                }
+
+                //hasAxe = false;
             }
 
             //Ataque en carrera/caida--------------------
@@ -98,12 +125,6 @@ public class PersonajeController : MonoBehaviour
                 StartCoroutine(Atacar());
             }
 
-            /*
-            if (Input.GetMouseButtonDown(0) && (isJumping || isFalling))
-            {
-                jumpAttack = true;
-                StartCoroutine(Atacar());
-            }*/
 
             //Deslizarse-----------------------------------------
             if (Input.GetKey(KeyCode.C) && IsOnGround && canSlide)
@@ -124,19 +145,22 @@ public class PersonajeController : MonoBehaviour
                 //Correr
                 if(Input.GetKey(KeyCode.LeftShift))
                 {
+                    if(IsOnGround)
+                    {
                         isRunning = true;
                         runAnimator.SetBool("IsRunning", true);
+                    }
                 }
 
                 //Dejar de correr
-                if (Input.GetKeyUp(KeyCode.RightShift))
+                if (Input.GetKeyUp(KeyCode.LeftShift))
                 {
                     isRunning = false;
                     runAnimator.SetBool("IsRunning", false);
                 }
 
                 //Caminar
-                if (Input.GetKeyUp(KeyCode.D))
+                if (Input.GetKey(KeyCode.D))
                 {
                         isWalking = true;
                         runAnimator.SetBool("IsWalking", true);
@@ -150,11 +174,13 @@ public class PersonajeController : MonoBehaviour
                         speed = speedWalk;
                     }
 
-                    transform.position = Vector3.right * speed * Time.deltaTime;
+                    transform.position += Vector3.right * speed * Time.deltaTime;
+                    FlipRigth();
                 }
 
-                if (Input.GetKeyUp(KeyCode.A))
+                if (Input.GetKey(KeyCode.A))
                 {
+                    Debug.Log("Pulsando A");
                     isWalking = true;
                     runAnimator.SetBool("IsWalking", true);
 
@@ -167,7 +193,8 @@ public class PersonajeController : MonoBehaviour
                         speed = speedWalk;
                     }
 
-                    transform.position = Vector3.right * speed * Time.deltaTime;
+                    transform.position += Vector3.right * -speed * Time.deltaTime;
+                    FlipLeft();
                 }
 
                 //Parar movimiento
@@ -184,7 +211,7 @@ public class PersonajeController : MonoBehaviour
     void Saltar()
     {
         rb.velocity = new Vector2 (0f, jumpForce);
-        StartCoroutine(EsperaCaida());
+        runAnimator.SetTrigger("Jump");
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -241,7 +268,6 @@ public class PersonajeController : MonoBehaviour
             isWalking = false;
             isFalling = false;
             isRunning = false;
-            IsOnGround = false;
             isIdle = false;
             isAttacking = false;
             isSliding = false;
@@ -258,7 +284,7 @@ public class PersonajeController : MonoBehaviour
             }
 
             yield return new WaitForSeconds(1.5f);
-            runAnimator.SetBool("IsHurt", true);
+            runAnimator.SetBool("IsHurt", false);
 
             isHurt = false;
         }
@@ -299,22 +325,14 @@ public class PersonajeController : MonoBehaviour
     void FlipRigth()
     {
         gameObject.transform.localScale = new Vector3(5, 5, 5);
-        if (!turnPosition)
-        {
-            gameObject.transform.position = new Vector3(gameObject.transform.position.x + 0.848f, gameObject.transform.position.y, 0);
-            //mainCamera.transform.position = new Vector3(gameObject.transform.position.x - 0.848f, gameObject.transform.position.y, mainCamera.transform.position.z);
-            turnPosition = true;
-        }
+        miraDerecha = true; //1 Derecha
+        miraIzquierda = false;
     }
     
     void FlipLeft()
     {
         gameObject.transform.localScale = new Vector3(-5, 5, 5);
-        if (turnPosition)
-        {
-            gameObject.transform.position = new Vector3(gameObject.transform.position.x - 0.729f, gameObject.transform.position.y, 0);
-            //mainCamera.transform.position = new Vector3(gameObject.transform.position.x + 0.729f, gameObject.transform.position.y, mainCamera.transform.position.z);
-            turnPosition = false;
-        }
+        miraIzquierda = true; //1 Izquierda
+        miraDerecha = false;
     }
 }
