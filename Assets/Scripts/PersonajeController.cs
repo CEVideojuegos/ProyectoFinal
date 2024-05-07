@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class PersonajeController : MonoBehaviour
 {
@@ -16,6 +17,9 @@ public class PersonajeController : MonoBehaviour
     [SerializeField] private Collider2D colliderSlide;
 
     [SerializeField] GameObject hacha;
+
+    [SerializeField] Vector2 mousePos;
+    private Vector2 screenMousePos;
 
     private Animator runAnimator;
 
@@ -36,7 +40,7 @@ public class PersonajeController : MonoBehaviour
     private bool canSlide = true;
     private bool miraDerecha;
     private bool miraIzquierda;
-    private bool hasAxe;
+    private bool hasAxe = true;
 
     private float speedRun = 6f;
     private float speedWalk = 3.7f;
@@ -68,7 +72,11 @@ public class PersonajeController : MonoBehaviour
             runAnimator.SetBool("IsGrounded", IsOnGround);
             VelY = rb.velocity.y;
 
-            if(rb.velocity.y !=0) 
+            //Capturar posicion del mouse y convertirla en punto dentro del WorldView
+            mousePos = Input.mousePosition;
+            screenMousePos = Camera.main.ScreenToViewportPoint(mousePos);
+
+            if (rb.velocity.y !=0) 
             {
                 runAnimator.SetFloat("VelY", VelY);
             }
@@ -97,10 +105,35 @@ public class PersonajeController : MonoBehaviour
             {
                 if(hasAxe) 
                 {
+                    StartCoroutine(LanzarHacha());
+                    //Capturar posicion del mouse
+                    /*
                     GameObject aux;
 
                     aux = Instantiate(hacha, puntoLanzamiento.position, puntoLanzamiento.rotation);
 
+
+                    if (screenMousePos.x > 0.5f)
+                    {
+                        FlipRigth();
+                        aux.GetComponent<Rigidbody2D>().AddForce(screenMousePos * 10, ForceMode2D.Impulse);
+                    }
+                    else
+                    {
+                        FlipLeft();
+                        Vector2 invertScreenMousePos;
+                        invertScreenMousePos.x = (screenMousePos.x - 1f);
+                        invertScreenMousePos.y = screenMousePos.y;
+                        aux.GetComponent<Rigidbody2D>().AddForce((invertScreenMousePos) * 10, ForceMode2D.Impulse);
+                    }
+                    /*
+
+                    //aux.GetComponent<Rigidbody2D>().AddForce(screenMousePos * 10, ForceMode2D.Impulse);
+
+                    Debug.Log("PosX: " + screenMousePos.x);
+                    Debug.Log("Posy: " + screenMousePos.y);
+
+                    /*
                     if (miraDerecha)
                     {
                         aux.GetComponent<Rigidbody2D>().AddForce(new Vector2 (10f, 10f), ForceMode2D.Impulse);
@@ -108,9 +141,10 @@ public class PersonajeController : MonoBehaviour
                     {
                         aux.GetComponent<Rigidbody2D>().AddForce(new Vector2(-10f, 10f), ForceMode2D.Impulse);
                     }
+                    */
                 }
 
-                //hasAxe = false;
+                hasAxe = false;
             }
 
             //Ataque en carrera/caida--------------------
@@ -320,6 +354,59 @@ public class PersonajeController : MonoBehaviour
         yield return new WaitForSeconds(1.0f);
         canSlide = true;
 
+    }
+
+    private IEnumerator LanzarHacha()
+    {
+        GameObject aux;
+
+        Debug.Log("PosX: " + screenMousePos.x);
+        Debug.Log("Posy: " + screenMousePos.y);
+
+        Vector2 invertScreenMousePos1;
+        invertScreenMousePos1.x = (screenMousePos.x - 1f);
+        invertScreenMousePos1.y = screenMousePos.y;
+
+        Vector2 invertScreenMousePos2;
+        invertScreenMousePos2.x = screenMousePos.x;
+        invertScreenMousePos2.y = (screenMousePos.y - 0.5f);
+
+        Vector2 invertScreenMousePos3;
+
+        invertScreenMousePos3.x = (screenMousePos.x - 1);
+        invertScreenMousePos3.y = (screenMousePos.y - 0.5f);
+
+        if (screenMousePos.x > 0.5f)
+        {
+            FlipRigth();
+            yield return new WaitForSeconds(0.1f);
+            if (screenMousePos.y > 0.5f)
+            {
+                aux = Instantiate(hacha, puntoLanzamiento.position, puntoLanzamiento.rotation);
+                aux.GetComponent<Rigidbody2D>().AddForce(screenMousePos * 10, ForceMode2D.Impulse);
+            }
+            else
+            {
+                aux = Instantiate(hacha, puntoLanzamiento.position, puntoLanzamiento.rotation);
+                aux.GetComponent<Rigidbody2D>().AddForce(invertScreenMousePos2 * 10, ForceMode2D.Impulse);
+            }
+        }
+        else
+        {
+            FlipLeft();
+            yield return new WaitForSeconds(0.1f);
+            if (screenMousePos.y > 0.5f)
+            {
+                aux = Instantiate(hacha, puntoLanzamiento.position, puntoLanzamiento.rotation);
+                aux.GetComponent<Rigidbody2D>().AddForce(invertScreenMousePos1 * 10, ForceMode2D.Impulse);
+            } 
+            else
+            {
+                aux = Instantiate(hacha, puntoLanzamiento.position, puntoLanzamiento.rotation);
+                aux.GetComponent<Rigidbody2D>().AddForce(invertScreenMousePos3 * 10, ForceMode2D.Impulse);
+            }
+                
+        }
     }
     
     void FlipRigth()
