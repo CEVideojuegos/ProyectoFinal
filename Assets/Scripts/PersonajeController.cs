@@ -18,8 +18,8 @@ public class PersonajeController : MonoBehaviour
 
     [SerializeField] GameObject hacha;
 
-    [SerializeField] Vector2 mousePos;
-    private Vector2 screenMousePos;
+    //[SerializeField] Vector2 mousePos;
+    //private Vector2 screenMousePos;
 
     private Animator runAnimator;
 
@@ -73,8 +73,8 @@ public class PersonajeController : MonoBehaviour
             VelY = rb.velocity.y;
 
             //Capturar posicion del mouse y convertirla en punto dentro del WorldView
-            mousePos = Input.mousePosition;
-            screenMousePos = Camera.main.ScreenToViewportPoint(mousePos);
+            //mousePos = Input.mousePosition;
+            //screenMousePos = Camera.main.ScreenToViewportPoint(mousePos);
 
             if (rb.velocity.y !=0) 
             {
@@ -105,7 +105,8 @@ public class PersonajeController : MonoBehaviour
             {
                 if(hasAxe) 
                 {
-                    StartCoroutine(LanzarHacha());
+                    LanzaHacha();
+                    //StartCoroutine(LanzarHacha());
                     //Capturar posicion del mouse
                     /*
                     GameObject aux;
@@ -144,7 +145,7 @@ public class PersonajeController : MonoBehaviour
                     */
                 }
 
-                hasAxe = false;
+                //hasAxe = false;
             }
 
             //Ataque en carrera/caida--------------------
@@ -356,6 +357,7 @@ public class PersonajeController : MonoBehaviour
 
     }
 
+    /*
     private IEnumerator LanzarHacha()
     {
         GameObject aux;
@@ -383,7 +385,7 @@ public class PersonajeController : MonoBehaviour
             if (screenMousePos.y > 0.5f)
             {
                 aux = Instantiate(hacha, puntoLanzamiento.position, puntoLanzamiento.rotation);
-                aux.GetComponent<Rigidbody2D>().AddForce(screenMousePos * 10, ForceMode2D.Impulse);
+                aux.GetComponent<Rigidbody2D>().AddForce(screenMousePos.normalized * 10, ForceMode2D.Impulse);
             }
             else
             {
@@ -408,7 +410,22 @@ public class PersonajeController : MonoBehaviour
                 
         }
     }
-    
+    */
+
+    private void LanzaHacha()
+    {
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 direccion = (mousePos - this.transform.position);
+
+        direccion.z = 0;
+        direccion = direccion.normalized;
+
+        GameObject aux;
+
+        aux = Instantiate(hacha, puntoLanzamiento.position, puntoLanzamiento.rotation);
+        aux.GetComponent<Rigidbody2D>().AddForce(direccion * 10, ForceMode2D.Impulse);
+    }
+
     void FlipRigth()
     {
         gameObject.transform.localScale = new Vector3(5, 5, 5);

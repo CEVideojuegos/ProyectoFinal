@@ -5,28 +5,31 @@ using UnityEngine;
 public class Hacha : MonoBehaviour
 {
     [SerializeField] private Rigidbody2D rb2;
-    [SerializeField] private Animator animator;
-    [SerializeField] float hachaVel;
     [SerializeField] GameObject player;
+    [SerializeField] bool volando;
+    [SerializeField] float velSpin;
 
     void Start()
     {
         rb2 = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
     }
 
     void Update()
     {
-        hachaVel = rb2.velocity.x;
-        animator.SetFloat("VelX", hachaVel);
+        if (volando)
+        {
+            transform.Rotate(Vector3.forward, -velSpin);
+        }
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collision2D other)
     {
         if (other.gameObject.CompareTag("Suelo"))
         {
+            volando = false;
+            ContactPoint2D aux = other.contacts[0];
+            this.GetComponent<Transform>().rotation = Quaternion.FromToRotation(Vector3.up, -aux.normal);
             rb2.bodyType = RigidbodyType2D.Static;
-            animator.SetTrigger("HachaStop");
         }
 
         if (other.gameObject.CompareTag("Player"))
