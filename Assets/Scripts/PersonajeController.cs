@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 public class PersonajeController : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class PersonajeController : MonoBehaviour
     [SerializeField] private Camera mainCamera;
     [SerializeField] private Collider2D colliderNormal;
     [SerializeField] private Collider2D colliderSlide;
+    [SerializeField] private Slider sliderHP;
 
     [SerializeField] GameObject hacha;
 
@@ -63,6 +65,8 @@ public class PersonajeController : MonoBehaviour
 
     void Update()
     {
+        sliderHP.value = maxHealthWarrior;
+
         if (isDead)
         {
             runAnimator.SetTrigger("IsDead");

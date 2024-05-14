@@ -207,7 +207,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb69c6496541c1a4cb4541f80bbbb7b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb2: {fileID: 0}
-  player: {fileID: 0}
   volando: 0
-  velSpin: 0
+  velSpin: 1
