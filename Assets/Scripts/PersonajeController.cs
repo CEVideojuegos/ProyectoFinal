@@ -39,9 +39,9 @@ public class PersonajeController : MonoBehaviour
     private bool isHurt;
     private bool isDead;
 
+    private GameObject hachaLanzada;
+
     private bool canSlide = true;
-    private bool miraDerecha;
-    private bool miraIzquierda;
     private bool hasAxe = true;
 
     private float speedRun = 6f;
@@ -109,47 +109,12 @@ public class PersonajeController : MonoBehaviour
             {
                 if(hasAxe) 
                 {
-                    LanzaHacha();
-                    //StartCoroutine(LanzarHacha());
-                    //Capturar posicion del mouse
-                    /*
-                    GameObject aux;
-
-                    aux = Instantiate(hacha, puntoLanzamiento.position, puntoLanzamiento.rotation);
-
-
-                    if (screenMousePos.x > 0.5f)
-                    {
-                        FlipRigth();
-                        aux.GetComponent<Rigidbody2D>().AddForce(screenMousePos * 10, ForceMode2D.Impulse);
-                    }
-                    else
-                    {
-                        FlipLeft();
-                        Vector2 invertScreenMousePos;
-                        invertScreenMousePos.x = (screenMousePos.x - 1f);
-                        invertScreenMousePos.y = screenMousePos.y;
-                        aux.GetComponent<Rigidbody2D>().AddForce((invertScreenMousePos) * 10, ForceMode2D.Impulse);
-                    }
-                    /*
-
-                    //aux.GetComponent<Rigidbody2D>().AddForce(screenMousePos * 10, ForceMode2D.Impulse);
-
-                    Debug.Log("PosX: " + screenMousePos.x);
-                    Debug.Log("Posy: " + screenMousePos.y);
-
-                    /*
-                    if (miraDerecha)
-                    {
-                        aux.GetComponent<Rigidbody2D>().AddForce(new Vector2 (10f, 10f), ForceMode2D.Impulse);
-                    } else
-                    {
-                        aux.GetComponent<Rigidbody2D>().AddForce(new Vector2(-10f, 10f), ForceMode2D.Impulse);
-                    }
-                    */
+                    LanzarHacha();
+                    hasAxe = false;
+                }else if (hachaLanzada != null) 
+                {
+                    hachaLanzada.GetComponent<Hacha>().LlamarHacha(this.transform);
                 }
-
-                //hasAxe = false;
             }
 
             //Ataque en carrera/caida--------------------
@@ -416,7 +381,7 @@ public class PersonajeController : MonoBehaviour
     }
     */
 
-    private void LanzaHacha()
+    private void LanzarHacha()
     {
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector3 direccion = (mousePos - this.transform.position);
@@ -428,19 +393,21 @@ public class PersonajeController : MonoBehaviour
 
         aux = Instantiate(hacha, puntoLanzamiento.position, puntoLanzamiento.rotation);
         aux.GetComponent<Rigidbody2D>().AddForce(direccion * 10, ForceMode2D.Impulse);
+        hachaLanzada = aux;
+    }
+
+    public void RecogerHacha()
+    {
+        hasAxe = true;
     }
 
     void FlipRigth()
     {
         gameObject.transform.localScale = new Vector3(5, 5, 5);
-        miraDerecha = true; //1 Derecha
-        miraIzquierda = false;
     }
     
     void FlipLeft()
     {
         gameObject.transform.localScale = new Vector3(-5, 5, 5);
-        miraIzquierda = true; //1 Izquierda
-        miraDerecha = false;
     }
 }
