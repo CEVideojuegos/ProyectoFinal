@@ -4,14 +4,15 @@ using UnityEngine;
 
 public class Hacha : MonoBehaviour
 {
-    [SerializeField] private Rigidbody2D rb2;
-    [SerializeField] GameObject player;
+    private Rigidbody2D rb2;
     [SerializeField] bool volando;
     [SerializeField] float velSpin;
 
     void Start()
     {
         rb2 = GetComponent<Rigidbody2D>();
+
+        volando = true;
     }
 
     void Update()
@@ -22,8 +23,10 @@ public class Hacha : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter2D(Collision2D other)
+    private void OnCollisionEnter2D(Collision2D other)
     {
+        Debug.Log(volando);
+
         if (other.gameObject.CompareTag("Suelo"))
         {
             volando = false;
