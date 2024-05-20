@@ -217,6 +217,7 @@ public class PersonajeController : MonoBehaviour
 
         if (other.gameObject.CompareTag("Enemy") && canDealDamage)
         {
+            canDealDamage = false;
             other.gameObject.GetComponent<SlimeController>().ReceiveDMG();
         }
     }
@@ -262,7 +263,7 @@ public class PersonajeController : MonoBehaviour
         {
             isDead = true;
             colliderNormal.enabled = false;
-            colliderSlide.enabled = false;
+            colliderSlide.enabled = true;
         }
         else
         {
