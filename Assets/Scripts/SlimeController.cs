@@ -6,6 +6,9 @@ public class SlimeController : MonoBehaviour
 {
     [SerializeField] private float jumpForce;
     [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private int enemyHP;
+
+
     private Animator runAnimator;
     private bool enElSuelo;
     private bool isJumping = false;
@@ -45,5 +48,11 @@ public class SlimeController : MonoBehaviour
     void Saltar()
     {
         rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+    }
+
+    public void ReceiveDMG()
+    {
+        enemyHP--;
+        Debug.Log(enemyHP);
     }
 }
