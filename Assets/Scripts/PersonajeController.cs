@@ -184,7 +184,7 @@ public class PersonajeController : MonoBehaviour
 
                 if (Input.GetKey(KeyCode.A))
                 {
-                    Debug.Log("Pulsando A");
+                    //Debug.Log("Pulsando A");
                     isWalking = true;
                     runAnimator.SetBool("IsWalking", true);
 
