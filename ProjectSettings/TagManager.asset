@@ -8,6 +8,8 @@ TagManager:
   - Enemy
   - Pared
   - Hacha
+  - DeadZone
+  - Checkpoint
   layers:
   - Default
   - TransparentFX
