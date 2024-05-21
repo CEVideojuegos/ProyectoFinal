@@ -11,11 +11,13 @@ public class PersonajeController : MonoBehaviour
     [SerializeField] private float runSpeed;
     [SerializeField] private float jumpForce;
     [SerializeField] private float slideVelocity;
+    [SerializeField] private float attackDMG;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private int maxHealthWarrior;
     [SerializeField] private Camera mainCamera;
     [SerializeField] private Collider2D colliderNormal;
     [SerializeField] private Collider2D colliderSlide;
+    [SerializeField] private GameObject HitboxAtaque;
     [SerializeField] private Slider sliderHP;
 
     [SerializeField] GameObject hacha;
@@ -28,16 +30,15 @@ public class PersonajeController : MonoBehaviour
     [SerializeField] private bool IsOnGround;
     [SerializeField] private float VelY;
 
-    private bool isIdle;
-    private bool isWalking;
+
     private bool isRunning;
     private bool isAttacking;
     private bool isSliding;
     private bool sprintAttack;
-    private bool jumpAttack;
-    private bool isFalling;
     private bool isHurt;
     private bool isDead;
+
+    private bool canDealDamage;
 
     private GameObject hachaLanzada;
 
@@ -60,6 +61,7 @@ public class PersonajeController : MonoBehaviour
         colliderNormal.enabled = true;
         colliderSlide.enabled = false;
         hasAxe = true;
+        HitboxAtaque.SetActive(false);
 
     }
 
@@ -76,10 +78,6 @@ public class PersonajeController : MonoBehaviour
             runAnimator.SetBool("IsGrounded", IsOnGround);
             VelY = rb.velocity.y;
 
-            //Capturar posicion del mouse y convertirla en punto dentro del WorldView
-            //mousePos = Input.mousePosition;
-            //screenMousePos = Camera.main.ScreenToViewportPoint(mousePos);
-
             if (rb.velocity.y !=0) 
             {
                 runAnimator.SetFloat("VelY", VelY);
@@ -94,7 +92,6 @@ public class PersonajeController : MonoBehaviour
             //Ataque basico-------------------------------------------------------------
             if (Input.GetMouseButtonDown(0) && !isAttacking && !isRunning && IsOnGround)
             {
-                isWalking = false;
                 runAnimator.SetBool("IsWalking", false);
                 runAnimator.SetBool("IsRunning", false);
                 isAttacking = true;
@@ -120,7 +117,6 @@ public class PersonajeController : MonoBehaviour
             //Ataque en carrera/caida--------------------
             if (Input.GetMouseButtonDown(0) && !isAttacking && (isRunning || !IsOnGround))
             {
-                isWalking = false;
                 runAnimator.SetBool("IsWalking", false);
                 runAnimator.SetBool("IsRunning", false);
                 isAttacking = true;
@@ -166,7 +162,6 @@ public class PersonajeController : MonoBehaviour
                 //Caminar
                 if (Input.GetKey(KeyCode.D))
                 {
-                        isWalking = true;
                         runAnimator.SetBool("IsWalking", true);
                         
                     if(isRunning)
@@ -184,8 +179,7 @@ public class PersonajeController : MonoBehaviour
 
                 if (Input.GetKey(KeyCode.A))
                 {
-                    //Debug.Log("Pulsando A");
-                    isWalking = true;
+                    Debug.Log("Pulsando A");
                     runAnimator.SetBool("IsWalking", true);
 
                     if (isRunning)
@@ -204,7 +198,6 @@ public class PersonajeController : MonoBehaviour
                 //Parar movimiento
                 if ((Input.GetKeyUp(KeyCode.A)) || (Input.GetKeyUp(KeyCode.D)))
                 {
-                    isWalking = false;
                     runAnimator.SetBool("IsWalking", false) ;
                     runAnimator.SetBool("IsRunning", false);
                 }
@@ -223,13 +216,11 @@ public class PersonajeController : MonoBehaviour
         if (other.gameObject.CompareTag("Suelo"))
         {
             IsOnGround = true;
-            isFalling = false;
         }
 
-        
-        if (other.gameObject.CompareTag("Enemy") && !isHurt)
+        if (other.gameObject.CompareTag("Enemy") && canDealDamage)
         {
-            StartCoroutine(PlayInvulnerability(other.transform));
+            other.gameObject.GetComponent<SlimeController>().ReceiveDMG();
         }
     }
 
@@ -238,14 +229,24 @@ public class PersonajeController : MonoBehaviour
         if (other.gameObject.CompareTag("Suelo"))
         {
             IsOnGround = true;
-        }
+        } 
     }
 
+    
     void OnTriggerExit2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("Suelo"))
         {
             IsOnGround = false;
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy") && !isHurt)
+        {
+            CantDealDamage();
+            StartCoroutine(PlayInvulnerability(collision.transform));
         }
     }
 
@@ -269,10 +270,7 @@ public class PersonajeController : MonoBehaviour
         else
         {
             isHurt = true;
-            isWalking = false;
-            isFalling = false;
             isRunning = false;
-            isIdle = false;
             isAttacking = false;
             isSliding = false;
 
@@ -326,61 +324,6 @@ public class PersonajeController : MonoBehaviour
 
     }
 
-    /*
-    private IEnumerator LanzarHacha()
-    {
-        GameObject aux;
-
-        Debug.Log("PosX: " + screenMousePos.x);
-        Debug.Log("Posy: " + screenMousePos.y);
-
-        Vector2 invertScreenMousePos1;
-        invertScreenMousePos1.x = (screenMousePos.x - 1f);
-        invertScreenMousePos1.y = screenMousePos.y;
-
-        Vector2 invertScreenMousePos2;
-        invertScreenMousePos2.x = screenMousePos.x;
-        invertScreenMousePos2.y = (screenMousePos.y - 0.5f);
-
-        Vector2 invertScreenMousePos3;
-
-        invertScreenMousePos3.x = (screenMousePos.x - 1);
-        invertScreenMousePos3.y = (screenMousePos.y - 0.5f);
-
-        if (screenMousePos.x > 0.5f)
-        {
-            FlipRigth();
-            yield return new WaitForSeconds(0.1f);
-            if (screenMousePos.y > 0.5f)
-            {
-                aux = Instantiate(hacha, puntoLanzamiento.position, puntoLanzamiento.rotation);
-                aux.GetComponent<Rigidbody2D>().AddForce(screenMousePos.normalized * 10, ForceMode2D.Impulse);
-            }
-            else
-            {
-                aux = Instantiate(hacha, puntoLanzamiento.position, puntoLanzamiento.rotation);
-                aux.GetComponent<Rigidbody2D>().AddForce(invertScreenMousePos2 * 10, ForceMode2D.Impulse);
-            }
-        }
-        else
-        {
-            FlipLeft();
-            yield return new WaitForSeconds(0.1f);
-            if (screenMousePos.y > 0.5f)
-            {
-                aux = Instantiate(hacha, puntoLanzamiento.position, puntoLanzamiento.rotation);
-                aux.GetComponent<Rigidbody2D>().AddForce(invertScreenMousePos1 * 10, ForceMode2D.Impulse);
-            } 
-            else
-            {
-                aux = Instantiate(hacha, puntoLanzamiento.position, puntoLanzamiento.rotation);
-                aux.GetComponent<Rigidbody2D>().AddForce(invertScreenMousePos3 * 10, ForceMode2D.Impulse);
-            }
-                
-        }
-    }
-    */
-
     private void LanzarHacha()
     {
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -399,6 +342,18 @@ public class PersonajeController : MonoBehaviour
     public void RecogerHacha()
     {
         hasAxe = true;
+    }
+
+    public void CanDealDamage ()
+    {
+        canDealDamage = true;
+        HitboxAtaque.SetActive(true);
+    }
+
+    public void CantDealDamage()
+    {
+        canDealDamage = false;
+        HitboxAtaque.SetActive(false);
     }
 
     void FlipRigth()
