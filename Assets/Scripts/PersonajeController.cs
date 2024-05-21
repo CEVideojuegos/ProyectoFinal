@@ -22,6 +22,9 @@ public class PersonajeController : MonoBehaviour
 
     [SerializeField] GameObject hacha;
 
+    //[SerializeField] Vector2 mousePos;
+    //private Vector2 screenMousePos;
+
     private Animator runAnimator;
 
     [SerializeField] private bool IsOnGround;
