@@ -10,10 +10,12 @@ public class SlimeController : MonoBehaviour
     private Animator runAnimator;
     private bool enElSuelo;
     private bool isJumping = false;
+    private bool isDead;
     [SerializeField] private int maxHealthSlime;
 
     void Start()
     {
+        isDead = false;
         rb = GetComponent<Rigidbody2D>();
         runAnimator = GetComponent<Animator>();
     }
@@ -23,6 +25,11 @@ public class SlimeController : MonoBehaviour
         if (enElSuelo)
         {
             Saltar();
+        }
+
+        if (isDead)
+        {
+            runAnimator.SetTrigger("IsDead");
         }
     }
 
@@ -36,7 +43,9 @@ public class SlimeController : MonoBehaviour
             RecibirDaño(direction);
             if (maxHealthSlime <= 0)
             {
-                //Destroy(this.gameObject);
+                GetComponent<AiChase>().CantMove();
+                isDead = true;
+                Destroy(this.gameObject, 3f);
             }
         }
     }
