@@ -49,6 +49,8 @@ public class PersonajeController : MonoBehaviour
     [SerializeField] private float knockbackY;
 
     [SerializeField] Transform puntoLanzamiento;
+    [SerializeField] Vector2 lastCheckpoint;
+
 
     void Start()
     {
@@ -59,7 +61,6 @@ public class PersonajeController : MonoBehaviour
         colliderSlide.enabled = false;
         hasAxe = true;
         HitboxAtaque.SetActive(false);
-
     }
 
     void Update()
@@ -176,7 +177,6 @@ public class PersonajeController : MonoBehaviour
 
                 if (Input.GetKey(KeyCode.A))
                 {
-                    Debug.Log("Pulsando A");
                     runAnimator.SetBool("IsWalking", true);
 
                     if (isRunning)
@@ -210,20 +210,32 @@ public class PersonajeController : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Suelo"))
+        if (other.gameObject.CompareTag("Suelo") || other.gameObject.CompareTag("Hacha"))
         {
             IsOnGround = true;
         }
 
         if (other.gameObject.CompareTag("Enemy") && canDealDamage)
         {
+            canDealDamage = false;
             other.gameObject.GetComponent<SlimeController>().ReceiveDMG();
+        }
+
+        if (other.gameObject.CompareTag("DeadZone"))
+        {
+            this.transform.position = lastCheckpoint;
+        }
+
+        if (other.gameObject.CompareTag("Checkpoint"))
+        {
+            Debug.Log("Checkpoint actualizado");
+            lastCheckpoint = other.transform.position;
         }
     }
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.gameObject.CompareTag("Suelo"))
+        if (other.gameObject.CompareTag("Suelo") || other.gameObject.CompareTag("Hacha"))
         {
             IsOnGround = true;
         } 
@@ -262,7 +274,7 @@ public class PersonajeController : MonoBehaviour
         {
             isDead = true;
             colliderNormal.enabled = false;
-            colliderSlide.enabled = false;
+            colliderSlide.enabled = true;
         }
         else
         {
