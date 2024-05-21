@@ -70,6 +70,7 @@ public class SlimeController : MonoBehaviour
     public void RecibirDaño(Vector2 direction)
     {
         GetComponent<AiChase>().CantMove();
+        runAnimator.SetTrigger("IsHurt");
         rb.velocity = new Vector2(direction.x * 10f, 10f);
         Debug.Log(direction);
         StartCoroutine(Cooldown());
