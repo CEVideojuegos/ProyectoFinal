@@ -8,7 +8,8 @@ public class Hacha : MonoBehaviour
     [SerializeField] bool volando;
     [SerializeField] float velSpin;
     [SerializeField] float returnSpin;
-
+    [SerializeField] int axeDamage;
+    private bool canAttack;
     private bool recogiendo;
     private Transform player;
     private bool enPared;
@@ -16,7 +17,7 @@ public class Hacha : MonoBehaviour
     void Start()
     {
         rb2 = GetComponent<Rigidbody2D>();
-
+        canAttack = true;
         volando = true;
     }
 
@@ -70,6 +71,16 @@ public class Hacha : MonoBehaviour
             gameObject.layer = 0;
 
             enPared = true;
+        }else if (other.gameObject.CompareTag("Enemy") && canAttack)
+        {
+            canAttack = false;
+            //Golpea al enemigo
+            Vector2 direction = (other.transform.position - this.transform.position).normalized;
+            other.gameObject.GetComponent<SlimeController>().RecibirDaño(direction);
+            //Vuelve al personaje a hacha
+            GameObject aux = GameObject.FindWithTag("Player");
+            this.gameObject.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 5f), ForceMode2D.Impulse);
+            StartCoroutine(LlamarHachaDelay(aux.transform));
         }
     }
 
@@ -81,6 +92,11 @@ public class Hacha : MonoBehaviour
         recogiendo = true;
         player = other;
         rb2.bodyType = RigidbodyType2D.Kinematic;
+    }
+
+    public int getAxeDamage()
+    {
+        return axeDamage;
     }
 
     public bool EnPared()
@@ -98,5 +114,11 @@ public class Hacha : MonoBehaviour
                 Destroy(this);
             }
         }
+    }
+
+    IEnumerator LlamarHachaDelay(Transform aux)
+    {
+        yield return new WaitForSeconds(0.25f);
+        LlamarHacha(aux);
     }
 }

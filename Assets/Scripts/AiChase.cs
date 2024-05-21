@@ -7,19 +7,31 @@ public class AiChase : MonoBehaviour
     [SerializeField] private  GameObject warrior;
     [SerializeField] private float speed;
     private float distance;
+    private bool canMove;
     
     void Start()
     {
+        canMove = true;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         distance = Vector2.Distance(transform.position, warrior.transform.position);
-        Vector2 direction = warrior.transform.position - transform.position;
+        Vector2 direction = (warrior.transform.position - transform.position).normalized;
 
-        if (distance < 10)
+        if (distance < 10 && canMove)
         {
-            transform.position = Vector2.MoveTowards(this.transform.position, warrior.transform.position, speed * Time.deltaTime);
+            GetComponent<Rigidbody2D>().velocity = new Vector2(direction.x * speed, GetComponent<Rigidbody2D>().velocity.y);
         }
+    }
+
+    public void CanMove()
+    {
+        canMove = true;
+    }
+
+    public void CantMove()
+    {
+        canMove = false;
     }
 }
