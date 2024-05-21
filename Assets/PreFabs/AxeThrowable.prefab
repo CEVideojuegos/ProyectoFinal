@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 835713710543558936}
   m_Layer: 6
   m_Name: AxeThrowable
-  m_TagString: Untagged
+  m_TagString: Hacha
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
