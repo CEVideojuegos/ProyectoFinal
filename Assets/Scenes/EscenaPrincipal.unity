@@ -587,7 +587,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   jumpForce: 1
   rb: {fileID: 220460126}
-  enemyHP: 0
+  maxHealthSlime: 0
 --- !u!61 &220460132
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -42731,11 +42731,6 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
---- !u!1 &2145037373 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3417091107739765210, guid: ebed7c6df162e3c4e949c975cabc121f, type: 3}
-  m_PrefabInstance: {fileID: 3216803485229462048}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2016171204092633179
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -42813,17 +42808,21 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1195167874}
     - target: {fileID: 1233413864361058284, guid: ebed7c6df162e3c4e949c975cabc121f, type: 3}
-      propertyPath: HitboxAtaque
-      value: 
-      objectReference: {fileID: 2145037373}
+      propertyPath: walkSounds.Array.size
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 1233413864361058284, guid: ebed7c6df162e3c4e949c975cabc121f, type: 3}
-      propertyPath: lastCheckpoint
+      propertyPath: walkSounds.Array.data[0]
       value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2152021553847871818, guid: ebed7c6df162e3c4e949c975cabc121f, type: 3}
-      propertyPath: m_Mass
-      value: 1.3881483
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 8300000, guid: 1deb201b8bf8f89479323a74e421150b, type: 3}
+    - target: {fileID: 1233413864361058284, guid: ebed7c6df162e3c4e949c975cabc121f, type: 3}
+      propertyPath: walkSounds.Array.data[1]
+      value: 
+      objectReference: {fileID: 8300000, guid: 7c518e8469a403b4c981664ecb28a79a, type: 3}
+    - target: {fileID: 1233413864361058284, guid: ebed7c6df162e3c4e949c975cabc121f, type: 3}
+      propertyPath: walkSounds.Array.data[2]
+      value: 
+      objectReference: {fileID: 8300000, guid: 1f2844efbf7abf647ba3d75d510f823a, type: 3}
     - target: {fileID: 3641816704789292732, guid: ebed7c6df162e3c4e949c975cabc121f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -42863,14 +42862,6 @@ PrefabInstance:
     - target: {fileID: 3641816704789292732, guid: ebed7c6df162e3c4e949c975cabc121f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8138290550903403710, guid: ebed7c6df162e3c4e949c975cabc121f, type: 3}
-      propertyPath: m_IsTrigger
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8381076142820693506, guid: ebed7c6df162e3c4e949c975cabc121f, type: 3}
-      propertyPath: m_Enabled
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8951848491805332298, guid: ebed7c6df162e3c4e949c975cabc121f, type: 3}
       propertyPath: m_Name

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
+
 
 public class PersonajeController : MonoBehaviour
 {
@@ -51,15 +53,21 @@ public class PersonajeController : MonoBehaviour
     [SerializeField] Transform puntoLanzamiento;
     [SerializeField] Vector2 lastCheckpoint;
 
+    [SerializeField] AudioSource source;
+    [SerializeField] List<AudioClip> walkSounds;
+    private bool canProduceSound;
+
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         runAnimator = GetComponent<Animator>();
+        source = GetComponent<AudioSource>();
         
         colliderNormal.enabled = true;
         colliderSlide.enabled = false;
         hasAxe = true;
+        canProduceSound = true;
         HitboxAtaque.SetActive(false);
     }
 
@@ -79,6 +87,11 @@ public class PersonajeController : MonoBehaviour
             if (rb.velocity.y !=0) 
             {
                 runAnimator.SetFloat("VelY", VelY);
+            }
+
+            if((isRunning && IsOnGround && canProduceSound))
+            {
+                StartCoroutine(WalkSound());
             }
 
             //Salto----------------------------------------------------------
@@ -147,6 +160,7 @@ public class PersonajeController : MonoBehaviour
                     {
                         isRunning = true;
                         runAnimator.SetBool("IsRunning", true);
+
                     }
                 }
 
@@ -331,6 +345,16 @@ public class PersonajeController : MonoBehaviour
         yield return new WaitForSeconds(1.0f);
         canSlide = true;
 
+    }
+
+    private IEnumerator WalkSound()
+    {
+        int r;
+        r = Random.Range(0, walkSounds.Count);
+        source.PlayOneShot(walkSounds[r]);
+        canProduceSound = false;
+        yield return new WaitForSeconds(0.3f);
+        canProduceSound = true;
     }
 
     private void LanzarHacha()
