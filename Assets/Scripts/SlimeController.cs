@@ -7,11 +7,11 @@ public class SlimeController : MonoBehaviour
 {
     [SerializeField] private float jumpForce;
     [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private int maxHealthSlime;
     private Animator runAnimator;
     private bool enElSuelo;
     private bool isJumping = false;
     private bool isDead;
-    [SerializeField] private int maxHealthSlime;
 
     void Start()
     {
