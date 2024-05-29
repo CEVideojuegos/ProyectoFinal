@@ -7,13 +7,12 @@ public class SlimeController : MonoBehaviour
 {
     [SerializeField] private float jumpForce;
     [SerializeField] private Rigidbody2D rb;
-    [SerializeField] private int enemyHP;
+    [SerializeField] private int slimeHP;
 
 
     private Animator runAnimator;
     private bool enElSuelo;
     private bool isJumping = false;
-    [SerializeField] private int maxHealthSlime;
 
     void Start()
     {
@@ -21,28 +20,23 @@ public class SlimeController : MonoBehaviour
         runAnimator = GetComponent<Animator>();
     }
 
-    void Update()
-    {
-        if (enElSuelo)
-        {
-            Saltar();
-        }
-    }
-
+    /*
     private void OnCollisionEnter2D(Collision2D other)
     {
         if (other.gameObject.CompareTag("Hacha"))
         {
-            maxHealthSlime -= other.gameObject.GetComponent<Hacha>().getAxeDamage();
+            slimeHP -= other.gameObject.GetComponent<Hacha>().getAxeDamage();
             Vector2 direction = (this.transform.position - other.transform.position).normalized;
-            Debug.Log(direction);
-            RecibirDaño(direction);
-            if (maxHealthSlime <= 0)
+            GetComponent<AiChase>().CantMove();
+            rb.velocity = new Vector2(direction.x * 10f, 10f);
+            StartCoroutine(Cooldown());
+            Debug.Log(slimeHP);
+            if (slimeHP <= 0)
             {
-                //Destroy(this.gameObject);
+                Destroy(this.gameObject, 1f);
             }
         }
-    }
+    }*/
 
     void OnTriggerEnter2D(Collider2D other)
     {
@@ -62,28 +56,23 @@ public class SlimeController : MonoBehaviour
         }
     }
     
-    void Saltar()
-    {
-        //rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-    }
-    
     public void RecibirDaño(Vector2 direction)
     {
+        slimeHP--;
         GetComponent<AiChase>().CantMove();
         rb.velocity = new Vector2(direction.x * 10f, 10f);
-        Debug.Log(direction);
         StartCoroutine(Cooldown());
+    }
+
+    public void RecieveDMG()
+    {
+        slimeHP--;
+
     }
 
     IEnumerator Cooldown()
     {
         yield return new WaitForSeconds(5f);
         GetComponent<AiChase>().CanMove();
-    }
-
-    public void ReceiveDMG()
-    {
-        enemyHP--;
-        Debug.Log(enemyHP);
     }
 }

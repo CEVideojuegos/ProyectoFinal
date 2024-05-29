@@ -25,6 +25,7 @@ public class Hacha : MonoBehaviour
     {
         if (volando)
         {
+            canAttack = true;
             transform.Rotate(Vector3.forward, -velSpin);
         }
 
@@ -39,29 +40,27 @@ public class Hacha : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Suelo"))
         {
-            Debug.Log("Suelo");
             volando = false;
-            Debug.Log(volando);
+            canAttack = false;
+            
             ContactPoint2D aux = other.contacts[0];
             this.GetComponent<Transform>().rotation = Quaternion.FromToRotation(Vector3.up, -aux.normal);
             this.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
             this.GetComponent<Rigidbody2D>().velocity = Vector3.zero;
 
             gameObject.layer = 0;
+            //Debug.Log(canAttack);
         }
         else if(other.gameObject.CompareTag("Player"))
         {
-            Debug.Log("Player");
             if (!enPared)
             {
                 other.gameObject.GetComponent<PersonajeController>().RecogerHacha();
-                Debug.Log("Recogida");
                 Destroy(this.gameObject);
             }
 
         }else if (other.gameObject.CompareTag("Pared"))
         {
-            Debug.Log("Pared");
             volando = false;
             ContactPoint2D aux = other.contacts[0];
             this.GetComponent<Transform>().rotation = Quaternion.FromToRotation(Vector3.up, -aux.normal);
@@ -71,8 +70,10 @@ public class Hacha : MonoBehaviour
             gameObject.layer = 0;
 
             enPared = true;
-        }else if (other.gameObject.CompareTag("Enemy") && canAttack)
+        }
+        else if (other.gameObject.CompareTag("Enemy") && canAttack)
         {
+            Debug.Log(canAttack);
             canAttack = false;
             //Golpea al enemigo
             Vector2 direction = (other.transform.position - this.transform.position).normalized;

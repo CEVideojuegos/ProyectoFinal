@@ -67,11 +67,7 @@ public class PersonajeController : MonoBehaviour
     {
         sliderHP.value = maxHealthWarrior;
 
-        if (isDead)
-        {
-            runAnimator.SetTrigger("IsDead");
-            
-        } else if (!isDead) {
+        if (!isDead) {
 
             runAnimator.SetBool("IsGrounded", IsOnGround);
             VelY = rb.velocity.y;
@@ -82,7 +78,7 @@ public class PersonajeController : MonoBehaviour
             }
 
             //Salto----------------------------------------------------------
-            if (Input.GetKeyDown(KeyCode.Space) && IsOnGround && !isAttacking)
+            if (Input.GetKeyDown(KeyCode.Space) && IsOnGround && !isAttacking && !isHurt)
             {
                 Saltar();
             }
@@ -217,8 +213,10 @@ public class PersonajeController : MonoBehaviour
 
         if (other.gameObject.CompareTag("Enemy") && canDealDamage)
         {
+            Debug.Log("Enemigo detectado");
             canDealDamage = false;
-            other.gameObject.GetComponent<SlimeController>().ReceiveDMG();
+            Vector2 direction = (other.transform.position - this.transform.position).normalized;
+            other.gameObject.GetComponent<SlimeController>().RecibirDaño(direction);
         }
 
         if (other.gameObject.CompareTag("DeadZone"))
@@ -261,6 +259,7 @@ public class PersonajeController : MonoBehaviour
 
     private IEnumerator Atacar()
     {
+        CantDealDamage();
         yield return new WaitForSeconds(1f);
         isAttacking = false;
         runAnimator.SetBool("IsAttacking", isAttacking);
@@ -275,6 +274,7 @@ public class PersonajeController : MonoBehaviour
             isDead = true;
             colliderNormal.enabled = false;
             colliderSlide.enabled = true;
+            runAnimator.SetTrigger("IsDead");
         }
         else
         {
