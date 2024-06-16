@@ -55,7 +55,7 @@ public class Hacha : MonoBehaviour
             if (!enPared)
             {
                 other.gameObject.GetComponent<PersonajeController>().RecogerHacha();
-                Debug.Log("Recogida");
+                //Debug.Log("Recogida");
                 Destroy(this.gameObject);
             }
 
@@ -71,12 +71,11 @@ public class Hacha : MonoBehaviour
             gameObject.layer = 0;
 
             enPared = true;
-        }else if (other.gameObject.CompareTag("Enemy") && canAttack)
+        }else if (other.gameObject.CompareTag("Skeleton") && canAttack)
         {
             canAttack = false;
             //Golpea al enemigo
             Vector2 direction = (other.transform.position - this.transform.position).normalized;
-            other.gameObject.GetComponent<SlimeController>().RecibirDaño(direction);
             //Vuelve al personaje a hacha
             GameObject aux = GameObject.FindWithTag("Player");
             this.gameObject.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 5f), ForceMode2D.Impulse);

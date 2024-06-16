@@ -21,6 +21,7 @@ public class PersonajeController : MonoBehaviour
     [SerializeField] private Collider2D colliderSlide;
     [SerializeField] private GameObject HitboxAtaque;
     [SerializeField] private Slider sliderHP;
+    [SerializeField] private GameObject pantallaMuerte;
 
     [SerializeField] GameObject hacha;
 
@@ -72,7 +73,7 @@ public class PersonajeController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         runAnimator = GetComponent<Animator>();
         source = GetComponent<AudioSource>();
-        
+
         colliderNormal.enabled = true;
         colliderSlide.enabled = false;
         hasAxe = true;
@@ -88,9 +89,9 @@ public class PersonajeController : MonoBehaviour
 
         if (isDead)
         {
-            source.PlayOneShot(deathSound);
-            runAnimator.SetTrigger("IsDead");
-            
+            runAnimator.SetBool("IsDead", true);
+            StartCoroutine(DeathTransition());
+
         } else if (!isDead) {
 
             runAnimator.SetBool("IsGrounded", IsOnGround);
@@ -267,7 +268,7 @@ public class PersonajeController : MonoBehaviour
         }
 
         
-        if (other.gameObject.CompareTag("Enemy") && !isHurt && !isAttacking)
+        if ((other.gameObject.CompareTag("Enemy") || other.gameObject.CompareTag("Skeleton")) && !isHurt && !isAttacking)
         {
             if(maxHealthWarrior > 1)
             {
@@ -279,6 +280,15 @@ public class PersonajeController : MonoBehaviour
 
         if (other.gameObject.CompareTag("DeadZone"))
         {
+            maxHealthWarrior--;
+
+            if (maxHealthWarrior <= 0)
+            {
+                isDead = true;
+                colliderNormal.enabled = false;
+                colliderSlide.enabled = true;
+            }
+
             this.transform.position = lastCheckpoint;
         }
 
@@ -306,14 +316,20 @@ public class PersonajeController : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionStay2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Enemy") && !isHurt)
+        if (collision.gameObject.CompareTag("Enemy") && canDealDamage)
         {
             Vector2 direction = (collision.transform.position - this.transform.position).normalized;
             CantDealDamage();
             collision.gameObject.GetComponent<SlimeController>().RecibirDaño(direction);
-            //StartCoroutine(PlayInvulnerability(collision.transform));
+        }
+
+        if (collision.gameObject.CompareTag("Skeleton") && canDealDamage)
+        {
+            Vector2 direction = (collision.transform.position - this.transform.position).normalized;
+            CantDealDamage();
+            collision.gameObject.GetComponent<SkeletonControler>().RecibirDaño(direction);
         }
     }
 
@@ -324,7 +340,7 @@ public class PersonajeController : MonoBehaviour
         runAnimator.SetBool("IsAttacking", isAttacking);
     }  
 
-    private IEnumerator PlayInvulnerability(Transform enemigo)
+    public IEnumerator PlayInvulnerability(Transform enemigo)
     {
         maxHealthWarrior--;
 
@@ -436,6 +452,20 @@ public class PersonajeController : MonoBehaviour
         canProduceSoundAttack= true;
     }
 
+    private IEnumerator DeathTransition()
+    {
+        source.PlayOneShot(deathSound);
+        isDead = false;
+        pantallaMuerte.SetActive(true);
+        runAnimator.SetBool("IsDead", false);
+        colliderNormal.enabled = true;
+        colliderSlide.enabled = false;
+        maxHealthWarrior = 5;
+        yield return new WaitForSeconds(5f);
+        this.transform.position = lastCheckpoint;
+        pantallaMuerte.SetActive(false);
+    }
+
 
     private void LanzarHacha()
     {
@@ -450,6 +480,11 @@ public class PersonajeController : MonoBehaviour
         aux = Instantiate(hacha, puntoLanzamiento.position, puntoLanzamiento.rotation);
         aux.GetComponent<Rigidbody2D>().AddForce(direccion * 10, ForceMode2D.Impulse);
         hachaLanzada = aux;
+    }
+    
+    public void RecibirAtaque(Transform enemigo)
+    {
+        StartCoroutine(PlayInvulnerability(enemigo));
     }
 
     public void RecogerHacha()
