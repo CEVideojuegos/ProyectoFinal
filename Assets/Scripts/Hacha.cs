@@ -39,7 +39,7 @@ public class Hacha : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Suelo"))
         {
-            Debug.Log("Suelo");
+            //Debug.Log("Suelo");
             volando = false;
             Debug.Log(volando);
             ContactPoint2D aux = other.contacts[0];
@@ -51,7 +51,7 @@ public class Hacha : MonoBehaviour
         }
         else if(other.gameObject.CompareTag("Player"))
         {
-            Debug.Log("Player");
+            //Debug.Log("Player");
             if (!enPared)
             {
                 other.gameObject.GetComponent<PersonajeController>().RecogerHacha();
@@ -61,7 +61,7 @@ public class Hacha : MonoBehaviour
 
         }else if (other.gameObject.CompareTag("Pared"))
         {
-            Debug.Log("Pared");
+            //Debug.Log("Pared");
             volando = false;
             ContactPoint2D aux = other.contacts[0];
             this.GetComponent<Transform>().rotation = Quaternion.FromToRotation(Vector3.up, -aux.normal);
