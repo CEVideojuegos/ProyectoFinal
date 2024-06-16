@@ -58,6 +58,10 @@ public class PersonajeController : MonoBehaviour
     [SerializeField] List<AudioClip> walkSounds;
     [SerializeField] List<AudioClip> runSounds;
     [SerializeField] List<AudioClip> swordSounds;
+    [SerializeField] List<AudioClip> jumpSounds;
+    [SerializeField] List<AudioClip> landSounds;
+    [SerializeField] List<AudioClip> hurtSounds;
+    [SerializeField] AudioClip deathSound;
     private bool canProduceSoundRun;
     private bool canProduceSoundWalk;
     private bool canProduceSoundAttack;
@@ -84,6 +88,7 @@ public class PersonajeController : MonoBehaviour
 
         if (isDead)
         {
+            source.PlayOneShot(deathSound);
             runAnimator.SetTrigger("IsDead");
             
         } else if (!isDead) {
@@ -248,18 +253,27 @@ public class PersonajeController : MonoBehaviour
     {
         rb.velocity = new Vector2 (0f, jumpForce);
         runAnimator.SetTrigger("Jump");
+        int r = Random.Range(0, jumpSounds.Count);
+        source.PlayOneShot(jumpSounds[r]);
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("Suelo") || other.gameObject.CompareTag("Hacha"))
         {
+            int r = Random.Range(0, landSounds.Count);
+            source.PlayOneShot(landSounds[r]);
             IsOnGround = true;
         }
 
         
         if (other.gameObject.CompareTag("Enemy") && !isHurt)
         {
+            if(maxHealthWarrior > 1)
+            {
+                int r = Random.Range(0, hurtSounds.Count);
+                source.PlayOneShot(hurtSounds[r]);
+            }
             StartCoroutine(PlayInvulnerability(other.transform));
         }
 
@@ -286,7 +300,7 @@ public class PersonajeController : MonoBehaviour
     
     void OnTriggerExit2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Suelo"))
+        if (other.gameObject.CompareTag("Suelo") || other.gameObject.CompareTag("Hacha"))
         {
             IsOnGround = false;
         }
