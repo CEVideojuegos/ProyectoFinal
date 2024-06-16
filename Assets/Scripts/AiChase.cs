@@ -11,6 +11,8 @@ public class AiChase : MonoBehaviour
     
     void Start()
     {
+        GameObject aux = GameObject.FindGameObjectWithTag("Player");
+        warrior = aux;
         canMove = true;
     }
 

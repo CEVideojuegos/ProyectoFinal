@@ -18,11 +18,11 @@ GameObject:
   - component: {fileID: 2963837110905051018}
   m_Layer: 0
   m_Name: Green Slime
-  m_TagString: Enemy
+  m_TagString: Slime
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1524859157886593350
 Transform:
   m_ObjectHideFlags: 0
@@ -210,7 +210,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cccdffd4861df64c997b6a8e7994a87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jumpForce: 1
+  jumpForce: 0.5
   rb: {fileID: 7459349232348052306}
   maxHealthSlime: 2
 --- !u!61 &2963837110905051018

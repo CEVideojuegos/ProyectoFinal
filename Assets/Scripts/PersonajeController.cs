@@ -101,7 +101,6 @@ public class PersonajeController : MonoBehaviour
             {
                 runAnimator.SetFloat("VelY", VelY);
             }
-
             
             if ((isRunning && IsOnGround && canProduceSoundRun))
             {
@@ -268,7 +267,7 @@ public class PersonajeController : MonoBehaviour
         }
 
         
-        if ((other.gameObject.CompareTag("Enemy") || other.gameObject.CompareTag("Skeleton")) && !isHurt && !isAttacking)
+        if ((other.gameObject.CompareTag("Slime") || other.gameObject.CompareTag("RedSlime") || other.gameObject.CompareTag("Skeleton")) && !isHurt && !isAttacking)
         {
             if(maxHealthWarrior > 1)
             {
@@ -318,11 +317,18 @@ public class PersonajeController : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Enemy") && canDealDamage)
+        if (collision.gameObject.CompareTag("Slime") && canDealDamage)
         {
             Vector2 direction = (collision.transform.position - this.transform.position).normalized;
             CantDealDamage();
             collision.gameObject.GetComponent<SlimeController>().RecibirDaño(direction);
+        }
+
+        if (collision.gameObject.CompareTag("RedSlime") && canDealDamage)
+        {
+            Vector2 direction = (collision.transform.position - this.transform.position).normalized;
+            CantDealDamage();
+            collision.gameObject.GetComponent<RedSlimeController>().RecibirDaño(direction);
         }
 
         if (collision.gameObject.CompareTag("Skeleton") && canDealDamage)
@@ -338,6 +344,7 @@ public class PersonajeController : MonoBehaviour
         yield return new WaitForSeconds(1f);
         isAttacking = false;
         runAnimator.SetBool("IsAttacking", isAttacking);
+        HitboxAtaque.SetActive(false);
     }  
 
     public IEnumerator PlayInvulnerability(Transform enemigo)
