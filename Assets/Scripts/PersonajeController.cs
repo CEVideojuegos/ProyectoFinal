@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
+
 
 public class PersonajeController : MonoBehaviour
 {
@@ -28,7 +30,8 @@ public class PersonajeController : MonoBehaviour
     [SerializeField] private float VelY;
 
 
-    private bool isRunning;
+    [SerializeField] private bool isRunning;
+    [SerializeField] private bool isWalking;
     private bool isAttacking;
     private bool isSliding;
     private bool sprintAttack;
@@ -51,15 +54,31 @@ public class PersonajeController : MonoBehaviour
     [SerializeField] Transform puntoLanzamiento;
     [SerializeField] Vector2 lastCheckpoint;
 
+    [SerializeField] AudioSource source;
+    [SerializeField] List<AudioClip> walkSounds;
+    [SerializeField] List<AudioClip> runSounds;
+    [SerializeField] List<AudioClip> swordSounds;
+    [SerializeField] List<AudioClip> jumpSounds;
+    [SerializeField] List<AudioClip> landSounds;
+    [SerializeField] List<AudioClip> hurtSounds;
+    [SerializeField] AudioClip deathSound;
+    private bool canProduceSoundRun;
+    private bool canProduceSoundWalk;
+    private bool canProduceSoundAttack;
+
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         runAnimator = GetComponent<Animator>();
+        source = GetComponent<AudioSource>();
         
         colliderNormal.enabled = true;
         colliderSlide.enabled = false;
         hasAxe = true;
+        canProduceSoundRun = true;
+        canProduceSoundWalk = true;
+        canProduceSoundAttack = true;
         HitboxAtaque.SetActive(false);
     }
 
@@ -69,6 +88,7 @@ public class PersonajeController : MonoBehaviour
 
         if (isDead)
         {
+            source.PlayOneShot(deathSound);
             runAnimator.SetTrigger("IsDead");
             
         } else if (!isDead) {
@@ -79,6 +99,27 @@ public class PersonajeController : MonoBehaviour
             if (rb.velocity.y !=0) 
             {
                 runAnimator.SetFloat("VelY", VelY);
+            }
+
+            
+            if ((isRunning && IsOnGround && canProduceSoundRun))
+            {
+                StartCoroutine(RunSound());
+            }
+
+            if ((isWalking && IsOnGround && canProduceSoundWalk))
+            {
+                StartCoroutine(WalkSound());
+            }
+
+            if (isAttacking && canProduceSoundAttack)
+            {
+                StartCoroutine(AttackSoundNormal());
+            } 
+            
+            if (isAttacking && (isRunning || !IsOnGround) && canProduceSoundAttack)
+            {
+                StartCoroutine(AttackSoundSpecial());
             }
 
             //Salto----------------------------------------------------------
@@ -121,6 +162,7 @@ public class PersonajeController : MonoBehaviour
                 runAnimator.SetBool("IsAttacking", true);
                 runAnimator.SetTrigger("DashAttack");
                 StartCoroutine(Atacar());
+                isRunning = false;
             }
 
 
@@ -146,6 +188,7 @@ public class PersonajeController : MonoBehaviour
                     if(IsOnGround)
                     {
                         isRunning = true;
+                        isWalking = false;
                         runAnimator.SetBool("IsRunning", true);
                     }
                 }
@@ -162,6 +205,7 @@ public class PersonajeController : MonoBehaviour
                 {
                         runAnimator.SetBool("IsWalking", true);
                         
+                        
                     if(isRunning)
                     {
                         speed = speedRun;
@@ -169,6 +213,7 @@ public class PersonajeController : MonoBehaviour
                     else
                     {
                         speed = speedWalk;
+                        isWalking = true;
                     }
 
                     transform.position += Vector3.right * speed * Time.deltaTime;
@@ -186,6 +231,7 @@ public class PersonajeController : MonoBehaviour
                     else
                     {
                         speed = speedWalk;
+                        isWalking = true;
                     }
 
                     transform.position += Vector3.right * -speed * Time.deltaTime;
@@ -195,6 +241,7 @@ public class PersonajeController : MonoBehaviour
                 //Parar movimiento
                 if ((Input.GetKeyUp(KeyCode.A)) || (Input.GetKeyUp(KeyCode.D)))
                 {
+                    isWalking = false;
                     runAnimator.SetBool("IsWalking", false) ;
                     runAnimator.SetBool("IsRunning", false);
                 }
@@ -206,18 +253,27 @@ public class PersonajeController : MonoBehaviour
     {
         rb.velocity = new Vector2 (0f, jumpForce);
         runAnimator.SetTrigger("Jump");
+        int r = Random.Range(0, jumpSounds.Count);
+        source.PlayOneShot(jumpSounds[r]);
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("Suelo") || other.gameObject.CompareTag("Hacha"))
         {
+            int r = Random.Range(0, landSounds.Count);
+            source.PlayOneShot(landSounds[r]);
             IsOnGround = true;
         }
 
         
         if (other.gameObject.CompareTag("Enemy") && !isHurt)
         {
+            if(maxHealthWarrior > 1)
+            {
+                int r = Random.Range(0, hurtSounds.Count);
+                source.PlayOneShot(hurtSounds[r]);
+            }
             StartCoroutine(PlayInvulnerability(other.transform));
         }
 
@@ -244,7 +300,7 @@ public class PersonajeController : MonoBehaviour
     
     void OnTriggerExit2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Suelo"))
+        if (other.gameObject.CompareTag("Suelo") || other.gameObject.CompareTag("Hacha"))
         {
             IsOnGround = false;
         }
@@ -332,6 +388,52 @@ public class PersonajeController : MonoBehaviour
         canSlide = true;
 
     }
+
+    private IEnumerator RunSound()
+    {
+        int r;
+        r = Random.Range(0, runSounds.Count);
+        source.PlayOneShot(runSounds[r]);
+        canProduceSoundRun = false;
+        yield return new WaitForSeconds(0.35f);
+        canProduceSoundRun = true;
+    }
+
+    private IEnumerator WalkSound()
+    {
+        int r;
+        r = Random.Range(0, walkSounds.Count);
+        source.PlayOneShot(walkSounds[r]);
+        canProduceSoundWalk= false;
+        yield return new WaitForSeconds(0.45f);
+        canProduceSoundWalk = true;
+    }
+
+    private IEnumerator AttackSoundNormal()
+    {
+        int r;
+        r = Random.Range(0, swordSounds.Count);
+        source.PlayOneShot(swordSounds[r]);
+        canProduceSoundAttack = false;
+        yield return new WaitForSeconds(0.4f);
+        r = Random.Range(0, swordSounds.Count);
+        canProduceSoundAttack = true;
+        source.PlayOneShot(swordSounds[r]);
+        canProduceSoundAttack = false;
+        yield return new WaitForSeconds(0.8f);
+        canProduceSoundAttack = true;
+    }
+
+    private IEnumerator AttackSoundSpecial()
+    {
+        int r;
+        r = Random.Range(0, swordSounds.Count);
+        source.PlayOneShot(swordSounds[r]);
+        canProduceSoundAttack = false;
+        yield return new WaitForSeconds(1.2f);
+        canProduceSoundAttack= true;
+    }
+
 
     private void LanzarHacha()
     {
