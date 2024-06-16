@@ -587,7 +587,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   jumpForce: 1
   rb: {fileID: 220460126}
-  maxHealthSlime: 0
+  maxHealthSlime: 2
 --- !u!61 &220460132
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -660,11 +660,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8068589428734277745, guid: 27bf31f6833d5b742a6b7841e983dd6b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 19.34
+      value: 133.48
       objectReference: {fileID: 0}
     - target: {fileID: 8068589428734277745, guid: 27bf31f6833d5b742a6b7841e983dd6b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 4.93
+      value: 1.05
       objectReference: {fileID: 0}
     - target: {fileID: 8068589428734277745, guid: 27bf31f6833d5b742a6b7841e983dd6b, type: 3}
       propertyPath: m_LocalPosition.z
@@ -56182,13 +56182,17 @@ PrefabInstance:
       propertyPath: swordSounds.Array.data[3]
       value: 
       objectReference: {fileID: 8300000, guid: d8bf57a57cb4a7e4a97d06ab4b136fca, type: 3}
+    - target: {fileID: 3417091107739765210, guid: ebed7c6df162e3c4e949c975cabc121f, type: 3}
+      propertyPath: m_TagString
+      value: HitboxAtaque
+      objectReference: {fileID: 0}
     - target: {fileID: 3641816704789292732, guid: ebed7c6df162e3c4e949c975cabc121f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 105.18
       objectReference: {fileID: 0}
     - target: {fileID: 3641816704789292732, guid: ebed7c6df162e3c4e949c975cabc121f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 5
+      value: 4.12
       objectReference: {fileID: 0}
     - target: {fileID: 3641816704789292732, guid: ebed7c6df162e3c4e949c975cabc121f, type: 3}
       propertyPath: m_LocalPosition.z
@@ -56226,6 +56230,10 @@ PrefabInstance:
       propertyPath: m_audioClip
       value: 
       objectReference: {fileID: 8300000, guid: 16c8601e63bd1dd42aba4c5cf4be477e, type: 3}
+    - target: {fileID: 8138290550903403710, guid: ebed7c6df162e3c4e949c975cabc121f, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8882719105132556071, guid: ebed7c6df162e3c4e949c975cabc121f, type: 3}
       propertyPath: m_Enabled
       value: 1

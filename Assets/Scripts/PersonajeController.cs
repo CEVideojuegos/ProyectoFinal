@@ -267,7 +267,7 @@ public class PersonajeController : MonoBehaviour
         }
 
         
-        if (other.gameObject.CompareTag("Enemy") && !isHurt)
+        if (other.gameObject.CompareTag("Enemy") && !isHurt && !isAttacking)
         {
             if(maxHealthWarrior > 1)
             {
@@ -310,8 +310,10 @@ public class PersonajeController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Enemy") && !isHurt)
         {
+            Vector2 direction = (collision.transform.position - this.transform.position).normalized;
             CantDealDamage();
-            StartCoroutine(PlayInvulnerability(collision.transform));
+            collision.gameObject.GetComponent<SlimeController>().RecibirDaño(direction);
+            //StartCoroutine(PlayInvulnerability(collision.transform));
         }
     }
 

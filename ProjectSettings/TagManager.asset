@@ -10,6 +10,7 @@ TagManager:
   - Hacha
   - DeadZone
   - Checkpoint
+  - HitboxAtaque
   layers:
   - Default
   - TransparentFX

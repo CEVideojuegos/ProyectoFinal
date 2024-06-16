@@ -37,16 +37,10 @@ public class SlimeController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Hacha"))
         {
-            maxHealthSlime -= other.gameObject.GetComponent<Hacha>().getAxeDamage();
+            //maxHealthSlime -= other.gameObject.GetComponent<Hacha>().getAxeDamage();
             Vector2 direction = (this.transform.position - other.transform.position).normalized;
-            Debug.Log(direction);
+            //Debug.Log(direction);
             RecibirDaño(direction);
-            if (maxHealthSlime <= 0)
-            {
-                GetComponent<AiChase>().CantMove();
-                isDead = true;
-                Destroy(this.gameObject, 3f);
-            }
         }
     }
 
@@ -75,10 +69,19 @@ public class SlimeController : MonoBehaviour
     
     public void RecibirDaño(Vector2 direction)
     {
+        maxHealthSlime--;
+
+        if (maxHealthSlime <= 0)
+        {
+            GetComponent<AiChase>().CantMove();
+            isDead = true;
+            Destroy(this.gameObject, 3f);
+        }
+
         GetComponent<AiChase>().CantMove();
         runAnimator.SetTrigger("IsHurt");
         rb.velocity = new Vector2(direction.x * 10f, 10f);
-        Debug.Log(direction);
+        //Debug.Log(direction);
         StartCoroutine(Cooldown());
     }
 
