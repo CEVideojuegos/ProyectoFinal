@@ -14,6 +14,7 @@ TagManager:
   - Skeleton
   - RedSlime
   - Slime
+  - Boss
   layers:
   - Default
   - TransparentFX

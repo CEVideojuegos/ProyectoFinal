@@ -267,7 +267,7 @@ public class PersonajeController : MonoBehaviour
         }
 
         
-        if ((other.gameObject.CompareTag("Slime") || other.gameObject.CompareTag("RedSlime") || other.gameObject.CompareTag("Skeleton")) && !isHurt && !isAttacking)
+        if ((other.gameObject.CompareTag("Slime") || other.gameObject.CompareTag("RedSlime") || other.gameObject.CompareTag("Skeleton") || other.gameObject.CompareTag("Boss")) && !isHurt && !isAttacking)
         {
             if(maxHealthWarrior > 1)
             {
@@ -336,6 +336,13 @@ public class PersonajeController : MonoBehaviour
             Vector2 direction = (collision.transform.position - this.transform.position).normalized;
             CantDealDamage();
             collision.gameObject.GetComponent<SkeletonControler>().RecibirDaño(direction);
+        }
+
+        if (collision.gameObject.CompareTag("Boss") && canDealDamage)
+        {
+            Vector2 direction = (collision.transform.position - this.transform.position).normalized;
+            CantDealDamage();
+            collision.gameObject.GetComponent<BossController>().RecibirDaño(direction);
         }
     }
 

@@ -2,11 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SkeletonControler : MonoBehaviour
+public class BossController : MonoBehaviour
 {
     [SerializeField] int SkeletonHP;
     [SerializeField] Animator _animator;
 
+    private bool canCast;
     private bool canAttack;
     private bool isHurt;
     private bool isDead;
@@ -14,6 +15,7 @@ public class SkeletonControler : MonoBehaviour
     private bool canRecieveDamage;
 
     [SerializeField] private GameObject warrior;
+    [SerializeField] private GameObject spell;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private float speed;
     private float distance;
@@ -21,53 +23,67 @@ public class SkeletonControler : MonoBehaviour
 
     [SerializeField] private GameObject HitboxAtaque;
 
+    // Start is called before the first frame update
     void Start()
     {
         _animator = GetComponent<Animator>();
-
+        rb = GetComponent<Rigidbody2D>();
+        GameObject aux = GameObject.FindGameObjectWithTag("Player");
+        warrior = aux;
         canMove = true;
         canAttack = true;
-        HitboxAtaque.SetActive(false);
+        canCast = true;
     }
 
-    void FixedUpdate()
+    // Update is called once per frame
+    void Update()
     {
         distance = Vector2.Distance(transform.position, warrior.transform.position);
         Vector2 direction = (warrior.transform.position - transform.position).normalized;
 
-        if(direction.x > 0)
+        if (isDead)
         {
-            this.transform.localScale = new Vector3(3.6f, 3.6f, 0f);
-        } else
-        {
-            this.transform.localScale = new Vector3(-3.6f, 3.6f, 0f);
-        }
-
-        if(isDead)
-        {
-            Debug.Log("SkeletonHP");
             _animator.SetTrigger("IsDead");
-            isDead = true;
             canMove = false;
             canAttack = false;
-            Destroy(this.gameObject, 1f);
-        }
-        else
+            Destroy(this.gameObject, 2f);
+        } else
         {
-            if (distance < 10 && canMove)
+            int castChance = Random.Range(0, 15);
+
+            if(distance < 8 && castChance <= 5 && canCast) 
+            {
+                canCast = false;
+                canMove = false;
+                canAttack = false;
+                _animator.SetTrigger("IsCasting");
+                StartCoroutine(AttackSpell());
+                Debug.Log("Casting");
+            }
+
+            if (direction.x < 0)
+            {
+                this.transform.localScale = new Vector3(3.6f, 3.6f, 0f);
+            }
+            else
+            {
+                this.transform.localScale = new Vector3(-3.6f, 3.6f, 0f);
+            }
+
+            
+            if (distance < 10 && canMove && !isHurt && !canCast)
             {
                 GetComponent<Rigidbody2D>().velocity = new Vector2(direction.x * speed, GetComponent<Rigidbody2D>().velocity.y);
                 _animator.SetTrigger("IsWalking");
             }
 
-            if (distance < 2 && canAttack)
+            if (distance < 2 && canAttack && !isHurt)
             {
-                Debug.Log(canAttack);
                 canMove = false;
                 canAttack = false;
-                _animator.SetTrigger("Attack1");
+                _animator.SetTrigger("IsAttacking");
                 StartCoroutine(AttackCooldown());
-            }
+            } 
         }
     }
 
@@ -80,44 +96,26 @@ public class SkeletonControler : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D other)
-    {
-        if (other.gameObject.CompareTag("Hacha"))
-        {
-            Vector2 direction = (this.transform.position - other.transform.position).normalized;
-            RecibirDaño(direction);
-        }
-    }
-
     public void RecibirDaño(Vector2 direction)
     {
-        int blockChance = Random.Range(0, 9);
+        isHurt = true;
 
-        if (blockChance <= 3) 
+        if (SkeletonHP <= 0)
         {
-            canMove = false;
-            _animator.SetTrigger("IsBlocking");
-            StartCoroutine(AttackCooldown());
-        } 
-        else
-        {
-            if (SkeletonHP <= 0)
-            {
-                isDead = true;
-            }
-
-            _animator.SetTrigger("IsHurt");
-
-            rb.velocity = new Vector2(-direction.x * 5f, 5f);
-
-
-            SkeletonHP--;
+            isDead = true;
         }
+
+        _animator.SetTrigger("IsHurt");
+
+        rb.velocity = new Vector2(-direction.x * 5f, 5f);
+
+        SkeletonHP--;
+        StartCoroutine(HurtCooldown());
     }
 
     IEnumerator AttackCooldown()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(2f);
         canMove = true;
 
         yield return new WaitForSeconds(1f);
@@ -128,6 +126,19 @@ public class SkeletonControler : MonoBehaviour
     {
         yield return new WaitForSeconds(3f);
         canMove = true;
+        isHurt = false;
+    }
+
+    IEnumerator AttackSpell()
+    {
+        Instantiate(spell, warrior.transform.position + new Vector3(0f, 2f, 0f), warrior.transform.rotation);
+
+        yield return new WaitForSeconds(1f);
+        canMove = true;
+        canAttack = true;
+
+        yield return new WaitForSeconds(5f);
+        canCast = true;
     }
 
     public void CanDealDamage()
