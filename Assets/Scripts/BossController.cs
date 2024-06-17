@@ -33,6 +33,7 @@ public class BossController : MonoBehaviour
         canMove = true;
         canAttack = true;
         canCast = true;
+        canDealDamage = true;
     }
 
     // Update is called once per frame
@@ -51,6 +52,7 @@ public class BossController : MonoBehaviour
         {
             int castChance = Random.Range(0, 15);
 
+            
             if(distance < 8 && castChance <= 5 && canCast) 
             {
                 canCast = false;
@@ -77,13 +79,14 @@ public class BossController : MonoBehaviour
                 _animator.SetTrigger("IsWalking");
             }
 
+            
             if (distance < 2 && canAttack && !isHurt)
             {
                 canMove = false;
                 canAttack = false;
                 _animator.SetTrigger("IsAttacking");
                 StartCoroutine(AttackCooldown());
-            } 
+            }
         }
     }
 
@@ -93,6 +96,15 @@ public class BossController : MonoBehaviour
         {
             CantDealDamage();
             collision.gameObject.GetComponent<PersonajeController>().RecibirAtaque(this.transform);
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Hacha"))
+        {
+            Vector2 direction = (this.transform.position - other.transform.position).normalized;
+            RecibirDaño(direction);
         }
     }
 

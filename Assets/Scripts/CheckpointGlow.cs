@@ -14,7 +14,7 @@ public class CheckpointGlow : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("Cambio renderer");
+        //Debug.Log("Cambio renderer");
         if (other.gameObject.CompareTag("Player"))
         {
             m_SpriteRenderer.enabled = true;

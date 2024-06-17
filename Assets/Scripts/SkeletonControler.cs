@@ -23,6 +23,8 @@ public class SkeletonControler : MonoBehaviour
 
     void Start()
     {
+        GameObject aux = GameObject.FindGameObjectWithTag("Player");
+        warrior = aux;
         _animator = GetComponent<Animator>();
 
         canMove = true;

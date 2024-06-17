@@ -267,7 +267,7 @@ public class PersonajeController : MonoBehaviour
         }
 
         
-        if ((other.gameObject.CompareTag("Slime") || other.gameObject.CompareTag("RedSlime") || other.gameObject.CompareTag("Skeleton") || other.gameObject.CompareTag("Boss")) && !isHurt && !isAttacking)
+        if ((other.gameObject.CompareTag("Slime") || other.gameObject.CompareTag("RedSlime") || other.gameObject.CompareTag("Skeleton") || other.gameObject.CompareTag("Boss") || other.gameObject.CompareTag("Eye")) && !isHurt && !isAttacking)
         {
             if(maxHealthWarrior > 1)
             {
@@ -343,6 +343,13 @@ public class PersonajeController : MonoBehaviour
             Vector2 direction = (collision.transform.position - this.transform.position).normalized;
             CantDealDamage();
             collision.gameObject.GetComponent<BossController>().RecibirDaño(direction);
+        }
+
+        if (collision.gameObject.CompareTag("Eye") && canDealDamage)
+        {
+            Vector2 direction = (collision.transform.position - this.transform.position).normalized;
+            CantDealDamage();
+            collision.gameObject.GetComponent<EyeController>().RecibirDaño(direction);
         }
     }
 
@@ -474,7 +481,7 @@ public class PersonajeController : MonoBehaviour
         runAnimator.SetBool("IsDead", false);
         colliderNormal.enabled = true;
         colliderSlide.enabled = false;
-        maxHealthWarrior = 5;
+        maxHealthWarrior = 10;
         yield return new WaitForSeconds(5f);
         this.transform.position = lastCheckpoint;
         pantallaMuerte.SetActive(false);

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class RedSlimeController : MonoBehaviour
 {
+    [SerializeField] private GameObject warrior;
     [SerializeField] private float jumpForce;
     [SerializeField] private Rigidbody2D rb;
     private Animator runAnimator;
@@ -15,6 +16,8 @@ public class RedSlimeController : MonoBehaviour
 
     void Start()
     {
+        GameObject aux = GameObject.FindGameObjectWithTag("Player");
+        warrior = aux;
         isDead = false;
         rb = GetComponent<Rigidbody2D>();
         runAnimator = GetComponent<Animator>();
