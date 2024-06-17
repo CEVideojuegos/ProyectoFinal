@@ -1984,6 +1984,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -7589358255775176, guid: 6b0722bd67082cc4ba664d6e0666a9a1, type: 3}
+      propertyPath: m_BodyType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 936248528183504438, guid: 6b0722bd67082cc4ba664d6e0666a9a1, type: 3}
       propertyPath: m_LocalPosition.x
       value: 113.892006
@@ -2023,6 +2027,10 @@ PrefabInstance:
     - target: {fileID: 936248528183504438, guid: 6b0722bd67082cc4ba664d6e0666a9a1, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2873194985512810535, guid: 6b0722bd67082cc4ba664d6e0666a9a1, type: 3}
+      propertyPath: EyeMaxHealth
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 9027286591404518421, guid: 6b0722bd67082cc4ba664d6e0666a9a1, type: 3}
       propertyPath: m_Name
