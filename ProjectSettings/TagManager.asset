@@ -11,6 +11,10 @@ TagManager:
   - DeadZone
   - Checkpoint
   - HitboxAtaque
+  - Skeleton
+  - RedSlime
+  - Slime
+  - Boss
   layers:
   - Default
   - TransparentFX

@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class SlimeController : MonoBehaviour
 {
+    [SerializeField] private GameObject warrior;
     [SerializeField] private float jumpForce;
     [SerializeField] private Rigidbody2D rb;
     private Animator runAnimator;
@@ -15,6 +16,8 @@ public class SlimeController : MonoBehaviour
 
     void Start()
     {
+        GameObject aux = GameObject.FindGameObjectWithTag("Player");
+        warrior = aux;
         isDead = false;
         rb = GetComponent<Rigidbody2D>();
         runAnimator = GetComponent<Animator>();
@@ -64,7 +67,7 @@ public class SlimeController : MonoBehaviour
     
     void Saltar()
     {
-        //rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
     }
     
     public void RecibirDaño(Vector2 direction)
@@ -80,7 +83,7 @@ public class SlimeController : MonoBehaviour
 
         GetComponent<AiChase>().CantMove();
         runAnimator.SetTrigger("IsHurt");
-        rb.velocity = new Vector2(direction.x * 10f, 10f);
+        rb.velocity = new Vector2(direction.x * 3f, 3f);
         //Debug.Log(direction);
         StartCoroutine(Cooldown());
     }

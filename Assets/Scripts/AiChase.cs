@@ -7,10 +7,12 @@ public class AiChase : MonoBehaviour
     [SerializeField] private  GameObject warrior;
     [SerializeField] private float speed;
     private float distance;
-    private bool canMove;
+    public bool canMove;
     
     void Start()
     {
+        GameObject aux = GameObject.FindGameObjectWithTag("Player");
+        warrior = aux;
         canMove = true;
     }
 
