@@ -154,7 +154,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 2
   m_Sprite: {fileID: 4723107735738678597, guid: 1018b0ba13578bf459bd254ae1a2be99, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -271,8 +271,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05791c8668badef4f887d2f9e62df7eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SkeletonHP: 1
-  SkeletonDMG: 1
+  SkeletonHP: 5
   _animator: {fileID: 493618232924757433}
   warrior: {fileID: 0}
   rb: {fileID: 5806901289551950627}

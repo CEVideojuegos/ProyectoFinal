@@ -77,7 +77,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 2
   m_Sprite: {fileID: -4795363162621231457, guid: 6d7cd4f7505dc674c891ca8946cfd98b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -125,7 +125,7 @@ MonoBehaviour:
   warrior: {fileID: 0}
   _animator: {fileID: 5929666890898690431}
   rb: {fileID: -7589358255775176}
-  maxHealthSlime: 0
+  EyeMaxHealth: 2
   speed: 3
 --- !u!50 &-7589358255775176
 Rigidbody2D:

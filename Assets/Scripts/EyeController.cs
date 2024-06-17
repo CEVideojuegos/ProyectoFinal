@@ -42,7 +42,7 @@ public class EyeController : MonoBehaviour
         {
             canMove = false;
             _animator.SetTrigger("IsDead");
-            Destroy(this.gameObject, 2);
+            Destroy(this.gameObject, 1);
         }
 
         if (distance < 10 && canMove)
@@ -68,9 +68,15 @@ public class EyeController : MonoBehaviour
             {
                 isDead = true;
             }
-
+            canMove = false;
             _animator.SetTrigger("IsHurt");
-
             EyeMaxHealth--;
+        StartCoroutine(HurtCooldown());
+    }
+
+    IEnumerator HurtCooldown()
+    {
+        yield return new WaitForSeconds(3f);
+        canMove = true;
     }
 }

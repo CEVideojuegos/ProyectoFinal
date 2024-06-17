@@ -103,7 +103,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 3e5bcf39820f7f44ea0b157ae9b8e992, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 16c8601e63bd1dd42aba4c5cf4be477e, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.007
   m_Pitch: 1
@@ -201,7 +201,7 @@ GameObject:
   - component: {fileID: 8138290550903403710}
   m_Layer: 7
   m_Name: HitBox_Ataque
-  m_TagString: Untagged
+  m_TagString: HitboxAtaque
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -253,7 +253,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 1.5050611, y: 0.08953977}
+  m_Offset: {x: 1.9860451, y: 0.08953977}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -264,7 +264,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.5573359, y: 1.8895164}
+  m_Size: {x: 2.5193038, y: 1.8895164}
   m_EdgeRadius: 0
 --- !u!1 &4710733380442902572
 GameObject:
@@ -478,7 +478,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 3
   m_Sprite: {fileID: -3318188226485093758, guid: ae72133dacba6ec4eb33ecde48f50e56, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -506,25 +506,53 @@ MonoBehaviour:
   runSpeed: 10
   jumpForce: 15
   slideVelocity: 10
-  attackDMG: 0
+  attackDMG: 1
   rb: {fileID: 2152021553847871818}
-  maxHealthWarrior: 5
+  maxHealthWarrior: 10
+  healthWarrior: 0
   mainCamera: {fileID: 4772904847883852392}
   colliderNormal: {fileID: 8381076142820693506}
   colliderSlide: {fileID: 8768926359962361274}
   HitboxAtaque: {fileID: 3417091107739765210}
   sliderHP: {fileID: 0}
+  pantallaMuerte: {fileID: 0}
   hacha: {fileID: 5126059990777457237, guid: d9faebe4b8dee9947aa7fa85712aa713, type: 3}
   IsOnGround: 0
   VelY: 0
+  isRunning: 0
+  isWalking: 0
   knockbackX: 10
   knockbackY: 5
   puntoLanzamiento: {fileID: 3340582167717321204}
   lastCheckpoint: {x: 0, y: 0}
   source: {fileID: 0}
-  walk1: {fileID: 8300000, guid: 9e68ea1ebd76aa44c8cfa5beb9850830, type: 3}
-  walk2: {fileID: 0}
-  walk3: {fileID: 0}
+  walkSounds:
+  - {fileID: 8300000, guid: feb62160ad1f8334ab037017b843d162, type: 3}
+  - {fileID: 8300000, guid: f1547ad8fbfa4f24d83e5a445aee860d, type: 3}
+  - {fileID: 8300000, guid: 9ea11a2d13d536e4e8441a0f5895995c, type: 3}
+  runSounds:
+  - {fileID: 8300000, guid: 7c518e8469a403b4c981664ecb28a79a, type: 3}
+  - {fileID: 8300000, guid: 1f2844efbf7abf647ba3d75d510f823a, type: 3}
+  - {fileID: 8300000, guid: 924e3e09c67130946a6d7b666e8b8b68, type: 3}
+  swordSounds:
+  - {fileID: 8300000, guid: 62e48d51911a9294aab8284e2a117204, type: 3}
+  - {fileID: 8300000, guid: ce9a41258643d7a458646b4721cfae36, type: 3}
+  - {fileID: 8300000, guid: 80502e18f68bb734b9dded7bb8d2e750, type: 3}
+  - {fileID: 8300000, guid: d8bf57a57cb4a7e4a97d06ab4b136fca, type: 3}
+  jumpSounds:
+  - {fileID: 8300000, guid: e708389b7a8f64a46aa12d201c187b69, type: 3}
+  - {fileID: 8300000, guid: caceea3cf407e1b47a4024a755887675, type: 3}
+  - {fileID: 8300000, guid: 322f3dcfdbd5b5742a885bfbc4fe5365, type: 3}
+  landSounds:
+  - {fileID: 8300000, guid: 79e6e1370ee1ca747b469e68d0dcb0fe, type: 3}
+  - {fileID: 8300000, guid: 45bc125cb8cb195408490bec63fde615, type: 3}
+  - {fileID: 8300000, guid: c2e0d3f88cb48f240af40a1f1bac7e8c, type: 3}
+  hurtSounds:
+  - {fileID: 8300000, guid: 321a4db06d7b7534b912f92e6796b2b3, type: 3}
+  - {fileID: 8300000, guid: 43453f6fb2aea1b44b9d6a0983abdf0b, type: 3}
+  - {fileID: 8300000, guid: c8678acd331bd334a93c25c717c929c7, type: 3}
+  - {fileID: 8300000, guid: 1ea85401d3bf8bf468d07d41dd4be64f, type: 3}
+  deathSound: {fileID: 8300000, guid: 710c608dfc0fa51438c497efe68ce6a0, type: 3}
 --- !u!50 &2152021553847871818
 Rigidbody2D:
   serializedVersion: 4
@@ -642,7 +670,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 16c8601e63bd1dd42aba4c5cf4be477e, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1

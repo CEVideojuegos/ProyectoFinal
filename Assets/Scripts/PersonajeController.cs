@@ -16,6 +16,7 @@ public class PersonajeController : MonoBehaviour
     [SerializeField] private float attackDMG;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private int maxHealthWarrior;
+    [SerializeField] private int healthWarrior;
     [SerializeField] private Camera mainCamera;
     [SerializeField] private Collider2D colliderNormal;
     [SerializeField] private Collider2D colliderSlide;
@@ -81,6 +82,7 @@ public class PersonajeController : MonoBehaviour
         canProduceSoundWalk = true;
         canProduceSoundAttack = true;
         HitboxAtaque.SetActive(false);
+        healthWarrior = 10;
     }
 
     void Update()
@@ -269,7 +271,7 @@ public class PersonajeController : MonoBehaviour
         
         if ((other.gameObject.CompareTag("Slime") || other.gameObject.CompareTag("RedSlime") || other.gameObject.CompareTag("Skeleton") || other.gameObject.CompareTag("Boss") || other.gameObject.CompareTag("Eye")) && !isHurt && !isAttacking)
         {
-            if(maxHealthWarrior > 1)
+            if (maxHealthWarrior > 1)
             {
                 int r = Random.Range(0, hurtSounds.Count);
                 source.PlayOneShot(hurtSounds[r]);
@@ -279,21 +281,13 @@ public class PersonajeController : MonoBehaviour
 
         if (other.gameObject.CompareTag("DeadZone"))
         {
-            maxHealthWarrior--;
-
-            if (maxHealthWarrior <= 0)
-            {
-                isDead = true;
-                colliderNormal.enabled = false;
-                colliderSlide.enabled = true;
-            }
-
             this.transform.position = lastCheckpoint;
         }
 
         if (other.gameObject.CompareTag("Checkpoint"))
         {
             Debug.Log("Checkpoint actualizado");
+            maxHealthWarrior = healthWarrior;
             lastCheckpoint = other.transform.position;
         }
     }
@@ -391,7 +385,6 @@ public class PersonajeController : MonoBehaviour
 
             yield return new WaitForSeconds(1.5f);
             runAnimator.SetBool("IsHurt", false);
-
             isHurt = false;
         }
     }

@@ -119,7 +119,7 @@ public class SkeletonControler : MonoBehaviour
 
     IEnumerator AttackCooldown()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(3f);
         canMove = true;
 
         yield return new WaitForSeconds(1f);
@@ -128,7 +128,7 @@ public class SkeletonControler : MonoBehaviour
 
     IEnumerator HurtCooldown()
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(4f);
         canMove = true;
     }
 
