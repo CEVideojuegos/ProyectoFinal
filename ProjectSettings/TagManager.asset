@@ -15,6 +15,7 @@ TagManager:
   - RedSlime
   - Slime
   - Boss
+  - Eye
   layers:
   - Default
   - TransparentFX
