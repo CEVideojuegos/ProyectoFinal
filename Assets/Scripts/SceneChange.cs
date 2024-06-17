@@ -5,11 +5,17 @@ using UnityEngine.SceneManagement;
 
 public class SceneChange : MonoBehaviour
 {
+    [SerializeField] private int level;
+
+    public void SeleccionarNivel()
+    {
+        SceneManager.LoadScene(level);
+    }
+
     void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("A");
         if (other.gameObject.CompareTag("Player")){
-            SceneManager.LoadScene(1);
+            SceneManager.LoadScene(level);
         }
     }
 }

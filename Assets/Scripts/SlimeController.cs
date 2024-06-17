@@ -78,7 +78,7 @@ public class SlimeController : MonoBehaviour
         {
             GetComponent<AiChase>().CantMove();
             isDead = true;
-            Destroy(this.gameObject, 3f);
+            Destroy(this.gameObject, 1f);
         }
 
         GetComponent<AiChase>().CantMove();
